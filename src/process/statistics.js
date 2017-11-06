@@ -1,0 +1,57 @@
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+/**
+ * Computes basic stats: min, max, mean/average and standard deviation of the image
+ * Algorithm for variance found below:
+ * https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm
+ *
+ * @params {TImage} img - Input image
+ * @params {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @author Jean-Christophe Taveau
+ */
+const statistics = (img, copy_mode = true) => {
+  let tmp = img.pixelData.reduce ( (accu,px,i) => {
+      accu.min = Math.min(accu.min,px);
+      accu.max = Math.max(accu.max,px);
+      accu.mean += px;
+      accu.n++;
+      let delta = px - accu.mean2;
+      accu.mean2 += delta/accu.n;
+      accu.variance += delta * delta;
+      return accu;
+    },
+    {min: Number.MAX_SAFE_INTEGER, max: 0, mean: 0.0, mean2 : 0.0, n: 0, variance: 0.0}
+  );
+
+  // Update stats in this TImage
+  img.statistics = {
+    min: tmp.min,
+    max: tmp.max,
+    mean : tmp.mean / img.pixelData.length,
+    stddev : Math.sqrt(tmp.variance / img.pixelData.length)
+  };
+  return img.statistics;
+}
+
