@@ -24,8 +24,6 @@
  
 /**
  * Add Salt and Pepper Noise
- * Algorithm for variance found below:
- * https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm
  *
  * @param {number} percent - percentage of noise added to the image
  * @param {TImage} img - Input image
