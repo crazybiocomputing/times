@@ -27,8 +27,8 @@
  * Algorithm for variance found below:
  * https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm
  *
- * @params {TImage} img - Input image
- * @params {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @param {TImage} img - Input image
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
  * @author Jean-Christophe Taveau
  */
 const statistics = (img, copy_mode = true) => {
