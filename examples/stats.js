@@ -7,14 +7,16 @@ img.setPixels(boats_pixels);
 console.log(statistics(img));
 console.log(img);
 
-/*
-**************** ImageJ Results *******************
+console.log(`ImageJ Results:
 Count = 103680
 Mean = 120.034
 StdDev = 47.902
 Min: 12
 Max: 214
 Mode; 157 (2046)
+`);
+
+/*
 Histogram
 0	0
 1	0

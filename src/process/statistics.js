@@ -49,6 +49,7 @@ const statistics = (img, copy_mode = true) => {
   img.statistics = {
     min: tmp.min,
     max: tmp.max,
+    count : img.pixelData.length,
     mean : tmp.mean / img.pixelData.length,
     stddev : Math.sqrt(tmp.variance / img.pixelData.length)
   };
