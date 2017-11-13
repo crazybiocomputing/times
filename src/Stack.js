@@ -21,11 +21,127 @@
  * Authors:
  * Jean-Christophe Taveau
  */
+ 
+/**
+ * @namespace T
+ */
+ 
+ 
+/**
+ * Class for Stack
+ *
+ * @alias T.Stack
+ */
 
-class TStack {
-  constructor() {
-    // Array of TImage
-    this.slices = [];
+export default class Stack {
+  /**
+   * Create an empty Stack
+   * @param {string} type - Pixel type number: uint8, uint16, float32, rgba
+   * @param {number} width - Width
+   * @param {number} height - Height
+   * @param {number} nslices - Slice number in the stack
+   */
+  constructor(title,type,width,height,nslices,pattern="black") {
+    /**
+     * Title
+     */
+    this.title = title;
+    
+    /**
+     * Width
+     */
+    this.width = width;
+    
+    /**
+     * Height
+     */
+    this.height = height;
+    
+    /**
+     * Type: uint8, uint16, uint32, float32,rgba
+     */
+    this.type = type;
+    
+    /**
+     * Pixels array
+     */
+    this.pixelData; 
+    
+    /**
+     * Slice number
+     */
+    this.nslices = nslices;
+    
+    /**
+     * Length = width * height * nslices
+     */
+    this.length = this.width * this.height * this.nslices;
+
+    /**
+     * Metadata containing annotations, information,etc.
+     */
+    this.metadata = {
+      dimension : 2.5,
+      title : title,
+      type: type,
+      width : width,
+      height : height,
+      nslices : nslices,
+      fill : pattern,
+    };
+    
+    /**
+     * Array of TRaster
+     */
+    this.slices = Array.from({length: nslices}, (x,i) => new T.Raster(type,width,height,i.toString()));
   }
+
+  /**
+   * Set pixels
+   *
+   * @author Jean-Christophe Taveau
+   */
+  setPixels(data) {
+    // TODO
+    this.raster.pixelData = data;
+  }
+
+
+  /**
+   * Execute function for each slice in this stack
+   *
+   * @param {function} func - Function run for each slice of the stack
+   *
+   * @author Jean-Christophe Taveau
+   */
+  forEach(func) {
+    this.slices.forEach( (x,i) => func(x,false));
+  }
+  
+  /**
+   * Execute function for each slice in this stack
+   *
+   * @param {function} func - Function run for each slice of the stack
+   * @return {array} - returns an array of objects
+   *
+   * @author Jean-Christophe Taveau
+   */
+  map(func) {
+    return this.slices.map( (x,i) => func(x,true));
+  }
+  
+  /**
+   * Extract one slice at given index 
+   *
+   * @param {number} index - Slice index must be comprised between 0 and length - 1
+   * @return {TRaster} 
+   * @author Jean-Christophe Taveau
+   */
+   slice(index) {
+    let output = this.slices[index];
+    // Copy pixels
+    output.setPixels(this.pixelData.filter( (x,i) => (i >= output.offset && i < output.offset + output.length) ) );
+    return output;
+   }
 }
 

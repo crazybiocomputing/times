@@ -22,7 +22,11 @@
  * Jean-Christophe Taveau
  */
 
+
 class TVolume {
+  /**
+   * @constructor
+   */
   constructor() {
   
   }
