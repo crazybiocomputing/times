@@ -204,7 +204,6 @@ const blue = (rgba) => rgba >> 8 & 0xff;
  */
 const alpha = (rgba) => rgba & 0xff;
 
-
 /**
  * Extract hue component of RGBA pixel value
  * @param {number} rgba - RGBA Pixel value 
@@ -245,13 +244,15 @@ const value = (rgba) => Math.max(red(rgba),Math.max(green(rgba), blue(rgba)));
 
 
 /**
- * Split channels of color TRaster according to various colorspaces
+ * Split channels of color Raster according to various colorspaces
  *
- * @param {function} fns - A series of function among:
- *  red(px), green(px),blue(px),alpha(px),
- *  hue(px),saturation(px),value(px),
- *  cyan(px),magenta(px),yellow(px),
- *  luminance(px), chrominance(px)
+ * @param {function} fns - A series of functions among:
+ * <ul>
+ * <li> red(px), green(px),blue(px),alpha(px),</li>
+ * <li> hue(px),saturation(px),value(px),</li>
+ * <li> cyan(px),magenta(px),yellow(px),</li>
+ * <li> luminance(px), chrominance(px)</li>
+ *</ul>
  * @param {Raster} color_img - A RGBA color image
  * @param {boolean} copy - Useless here, only for compatibility with the other process functions
  * @return {Stack} Return a stack containing the channels of various colorspaces
@@ -847,12 +848,12 @@ class Stack {
 
   /**
    * Set pixels
-   *
+   * 
+   * @alias T.Stack~setPixels
    * @author Jean-Christophe Taveau
    */
   setPixels(data) {
-    // TODO
-    this.raster.pixelData = data;
+    this.slices.forEach( (sli,i) => sli.pixelData = data.slice(i*sli.length, i*sli.length + sli.length) );
   }
 
 
