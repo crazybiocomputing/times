@@ -69,19 +69,19 @@ var T =
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return red; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return green; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return red; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return green; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return blue; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return alpha; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return luminance; });
-/* unused harmony export chrominanceRed */
-/* unused harmony export chrominanceBlue */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return luminance; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return chrominanceRed; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return chrominanceBlue; });
 /* unused harmony export average */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return hue; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return saturation; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return value; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return toABGR; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return splitChannels; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return hue; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return saturation; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return value; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return toABGR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return splitChannels; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -151,7 +151,6 @@ const toabgr = (rgba) => ( (rgba & 0xff) << 24) | ( (rgba & 0x00ff00) << 8) | ( 
  * @return {number} Luminance uint8 value 
  */
 const luminance = (rgba) => {
-  // TODO
   /*
   Franci Penov and Glenn Slayden
   From https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
@@ -168,6 +167,10 @@ const luminance = (rgba) => {
   let b = blue(rgba);
   return (r+r+r+b+g+g+g+g)>>3; 
 };
+
+const chrominanceRed = (rgba) => -0.168736 * red(rgba) - 0.331264 * green(rgba) + 0.500000 * blue(rgba) + 128;
+
+const chrominanceBlue = (rgba) => 0.500000 * red(rgba) - 0.418688 * green(rgba) - 0.081312 * blue(rgba) + 128;
 
 /**
  * Convert RGBA pixel value to Average gray value
@@ -211,16 +214,36 @@ const alpha = (rgba) => rgba & 0xff;
  */
 const hue = (rgba) => {
   const ratio = (a,b,delta) => (a-b)/delta;
-  let r = red(rgba), b = blue(rgba), g = green(rgba);
+  
+  let r = red(rgba) / 255.0, g = green(rgba) / 255.0, b = blue(rgba) / 255.0;
   let maxi = Math.max(r,Math.max(g,b));
   let mini = Math.min(r,Math.min(g,b));
   let delta = maxi - mini;
-  let out = (mini === maxi) ? 0 :
-    ( (maxi === r) ? (60 * ratio(g,b,delta) + 360) % 360 : 
-      ( (maxi === g) ? 60 * ratio(b,r,delta) + 120 : 
-        ( (maxi === b) ? 60 * ratio(r,g,delta) + 240 : 0) ) ); 
-  return Math.floor(out / 360 * 255);
+  let out = (maxi === 0 || mini === maxi) ? 0 :
+    ( (maxi === r) ? (60 * ratio(g,b,delta) + 0) % 360 : 
+      ( (maxi === g) ? 60 * ratio(b,r,delta) + 120 : 60 * ratio(r,g,delta) + 240 ) ); 
+  return Math.max(0,Math.min(Math.floor(out / 360.0 * 255),255));
 };
+
+const hue2 = (rgba) => {
+  let r = red(rgba), g = green(rgba), b = blue(rgba);
+  let maxi = Math.max(r,Math.max(g,b));
+  let mini = Math.min(r,Math.min(g,b));
+
+  if (maxi === 0 || maxi === mini) {
+    return 0;
+  }
+  
+  if (maxi === r) {
+    return  Math.max(0,Math.min(Math.floor(0 + 43 * (g - b) / (maxi - mini),255)));
+  }
+  else if (maxi === g) {
+    return Math.max(0,Math.min(85 + 43 * (b - r) / (maxi - mini)));
+  }
+  else {
+    return Math.max(0,Math.min(171 + 43 * (r - g) / (maxi - mini)));
+  }
+}
 
 /**
  * Extract saturation component of RGBA pixel value
@@ -242,7 +265,6 @@ const saturation = (rgba) => {
 const value = (rgba) => Math.max(red(rgba),Math.max(green(rgba), blue(rgba)));
 
 
-
 /**
  * Split channels of color Raster according to various colorspaces
  *
@@ -252,7 +274,7 @@ const value = (rgba) => Math.max(red(rgba),Math.max(green(rgba), blue(rgba)));
  * <li> hue(px),saturation(px),value(px),</li>
  * <li> cyan(px),magenta(px),yellow(px),</li>
  * <li> luminance(px), chrominance(px)</li>
- *</ul>
+ * </ul>
  * @param {Raster} color_img - A RGBA color image
  * @param {boolean} copy - Useless here, only for compatibility with the other process functions
  * @return {Stack} Return a stack containing the channels of various colorspaces
@@ -294,16 +316,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return __WEBPACK_IMPORTED_MODULE_1__Image__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Stack", function() { return __WEBPACK_IMPORTED_MODULE_2__Stack__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Window", function() { return __WEBPACK_IMPORTED_MODULE_3__Window__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["h"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["e"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "alpha", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["j"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toABGR", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceRed", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toABGR", function() { return __WEBPACK_IMPORTED_MODULE_4__process_color__["k"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_5__process_utils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_6__process_view__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_6__process_view__["b"]; });
@@ -587,6 +611,17 @@ class Raster {
     this.pixelData[index] = value;
   }
 
+  /**
+   * Pad a smaller raster within this raster
+   *
+   * @author Jean-Christophe Taveau
+   */
+  pad(topleft_x,topleft_y,small_img) {
+    for (let y = 0; y < small_img.height; y++) {
+      let chunk = small_img.pixelData.slice(y * small_img.width, (y+1) * small_img.width);
+      chunk.forEach ( (px, index) => this.pixelData[topleft_x + index + (topleft_y + y)* this.width] = px, this);
+    }
+  }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Raster;
 
@@ -841,7 +876,7 @@ class Stack {
     };
     
     /**
-     * Array of TRaster
+     * Array of slices Raster
      */
     this.slices = Array.from({length: nslices}, (x,i) => new T.Raster(type,width,height,i.toString()));
   }
@@ -888,10 +923,7 @@ class Stack {
    * @author Jean-Christophe Taveau
    */
    slice(index) {
-    let output = this.slices[index];
-    // Copy pixels
-    output.setPixels(this.pixelData.filter( (x,i) => (i >= output.offset && i < output.offset + output.length) ) );
-    return output;
+    return this.slices[index];
    }
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Stack;
@@ -1100,8 +1132,8 @@ const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
 const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
   console.log('TODO: montage(row,column,scale,border)');
   // TODO
-  let output = new T.Image('montage','uint8',stack.width, stack.height * stack.nslices);
-  output.setPixels( stack.slices.reduce( (accu,x) => [...accu,...x.pixelData], []) );
+  let output = new T.Image('montage','uint8',stack.width * column, stack.height * row);
+  stack.slices.forEach( (sli,index) => output.raster.pad( (index % column) * stack.width, Math.floor(index/ column) * stack.height,sli) );
   return output;
 };
 

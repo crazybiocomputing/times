@@ -95,7 +95,6 @@ const toabgr = (rgba) => ( (rgba &amp; 0xff) &lt;&lt; 24) | ( (rgba &amp; 0x00ff
  * @return {number} Luminance uint8 value 
  */
 const luminance = (rgba) => {
-  // TODO
   /*
   Franci Penov and Glenn Slayden
   From https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
@@ -112,6 +111,10 @@ const luminance = (rgba) => {
   let b = blue(rgba);
   return (r+r+r+b+g+g+g+g)>>3; 
 };
+
+const chrominanceRed = (rgba) => -0.168736 * red(rgba) - 0.331264 * green(rgba) + 0.500000 * blue(rgba) + 128;
+
+const chrominanceBlue = (rgba) => 0.500000 * red(rgba) - 0.418688 * green(rgba) - 0.081312 * blue(rgba) + 128;
 
 /**
  * Convert RGBA pixel value to Average gray value
@@ -155,16 +158,36 @@ const alpha = (rgba) => rgba &amp; 0xff;
  */
 const hue = (rgba) => {
   const ratio = (a,b,delta) => (a-b)/delta;
-  let r = red(rgba), b = blue(rgba), g = green(rgba);
+  
+  let r = red(rgba), g = green(rgba), b = blue(rgba);
   let maxi = Math.max(r,Math.max(g,b));
   let mini = Math.min(r,Math.min(g,b));
   let delta = maxi - mini;
-  let out = (mini === maxi) ? 0 :
+  let out = (maxi === 0 || mini === maxi) ? 0 :
     ( (maxi === r) ? (60 * ratio(g,b,delta) + 360) % 360 : 
-      ( (maxi === g) ? 60 * ratio(b,r,delta) + 120 : 
-        ( (maxi === b) ? 60 * ratio(r,g,delta) + 240 : 0) ) ); 
-  return Math.floor(out / 360 * 255);
+      ( (maxi === g) ? 60 * ratio(b,r,delta) + 120 : 60 * ratio(r,g,delta) + 240 ) ); 
+  return Math.max(0,Math.min(Math.floor(out / 360.0 * 255),255));
 };
+
+const hue2 = (rgba) => {
+  let r = red(rgba), g = green(rgba), b = blue(rgba);
+  let maxi = Math.max(r,Math.max(g,b));
+  let mini = Math.min(r,Math.min(g,b));
+
+  if (maxi === 0 || maxi === mini) {
+    return 0;
+  }
+  
+  if (maxi === r) {
+    return  Math.max(0,Math.min(Math.floor(0 + 43 * (g - b) / (maxi - mini),255)));
+  }
+  else if (maxi === g) {
+    return Math.max(0,Math.min(85 + 43 * (b - r) / (maxi - mini)));
+  }
+  else {
+    return Math.max(0,Math.min(171 + 43 * (r - g) / (maxi - mini)));
+  }
+}
 
 /**
  * Extract saturation component of RGBA pixel value
@@ -186,17 +209,16 @@ const saturation = (rgba) => {
 const value = (rgba) => Math.max(red(rgba),Math.max(green(rgba), blue(rgba)));
 
 
-
 /**
- * Split channels of color TRaster according to various colorspaces
+ * Split channels of color Raster according to various colorspaces
  *
- * @param {function} fns - A series of function among:
+ * @param {function} fns - A series of functions among:
  * &lt;ul>
  * &lt;li> red(px), green(px),blue(px),alpha(px),&lt;/li>
- * &lt;li>  hue(px),saturation(px),value(px),&lt;/li>
- * &lt;li>  cyan(px),magenta(px),yellow(px),&lt;/li>
- * &lt;li>  luminance(px), chrominance(px)&lt;/li>
- *&lt;/ul>
+ * &lt;li> hue(px),saturation(px),value(px),&lt;/li>
+ * &lt;li> cyan(px),magenta(px),yellow(px),&lt;/li>
+ * &lt;li> luminance(px), chrominance(px)&lt;/li>
+ * &lt;/ul>
  * @param {Raster} color_img - A RGBA color image
  * @param {boolean} copy - Useless here, only for compatibility with the other process functions
  * @return {Stack} Return a stack containing the channels of various colorspaces
@@ -228,13 +250,13 @@ export {splitChannels};
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render.html">render</a></li><li><a href="module-statistics.html">statistics</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="TVolume.html">TVolume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#getRaster">getRaster</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#rotate">rotate</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setPixels">setPixels</a></li><li><a href="global.html#setRaster">setRaster</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-geometry.html">geometry</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render.html">render</a></li><li><a href="module-statistics.html">statistics</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="TVolume.html">TVolume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#getRaster">getRaster</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pad">pad</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setPixels">setPixels</a></li><li><a href="global.html#setRaster">setRaster</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 13 2017 14:09:05 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 13 2017 17:04:26 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>
