@@ -50,51 +50,100 @@
  * Jean-Christophe Taveau
  */
 
+'use script';
+
 /**
  * @module geometry
  */
- 
+
+/**
+  * Fill with the pixel gray or color value depending of the raster type
+  * @param {number} value - A gray or color value
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const fillColor = (value) => (raster,copy_mode=true) => {
+  raster.pixelData.fill(value);
+  return raster;
+}
+  
+/**
+  * Fill raster with specific patterns
+  *
+  * @param {string} keyword - Pattern among: black, white, ramp, chessboard, noise
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const fillPattern = (keyword) => (raster,copy_mode=true) => {
+  // TODO
+}
+  
+/**
+  * Fill with values calculated from a function
+  */
+const fill = (func) => (raster,copy_mode=true) => {
+  let w = raster.width;
+  let h = raster.height;
+  let cx = h / 2.0;
+  let cy = h / 2.0;
+  
+  raster.pixelData.forEach ( (px,i,arr) => {
+    let x = i % w;
+    let y = Math.floor(i / w);
+    let z = Math.floor( i / w / h);
+    let d = Math.sqrt ((x-cx)**2 + (y -cy)**2);
+    let a = Math.atan2(y,x);
+    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+  });
+  return raster;
+};
+  
+
 /**
   * Flip vertically
   */
-  const flipV = (angle) => (img,copy_mode=true) => console.log('TODO: flipV');
+const flipV = (angle) => (raster,copy_mode=true) => console.log('TODO: flipV');
 
 /**
   * Flip horizontally
   */
-  const flipH = (angle) => (img,copy_mode=true) => console.log('TODO: flipH');
+const flipH = (angle) => (raster,copy_mode=true) => console.log('TODO: flipH');
 
 /**
   * Pad
   */
-  const pad = (topleft_x,topleft_y,new_width, new_height,value) => (img,copy_mode=true) => {
-    let output = new T.Raster(img.type,new_width,new_height);
-    output.pixelData = T.Raster.createPixels(output.type,output.length);
-    for (let y = 0; y &lt; img.height; y++) {
-      let chunk = img.pixelData.slice(y * img.width, (y+1) * img.width);
-      chunk.forEach ( (px, index) => ouput.pixelData[topleft_x + index + topleft_y * img.width] = px);
-    }
-    return output;
-  };
+const pad = (topleft_x,topleft_y,new_width, new_height,value) => (img,copy_mode=true) => {
+  let output = new T.Raster(img.type,new_width,new_height);
+  output.pixelData = T.Raster.createPixels(output.type,output.length);
+  for (let y = 0; y &lt; img.height; y++) {
+    let chunk = img.pixelData.slice(y * img.width, (y+1) * img.width);
+    chunk.forEach ( (px, index) => ouput.pixelData[topleft_x + index + topleft_y * img.width] = px);
+  }
+  return output;
+};
   
 /**
   * Rotate
   */
-  const rotate = (angle) => (img,copy_mode=true) => console.log('TODO: rotate');
+const rotate = (angle) => (raster,copy_mode=true) => console.log('TODO: rotate');
 
 /**
   * Scale
   */
-  const scale = (scalex, scaley) => (img,copy_mode=true) => console.log('TODO: scale');
+const scale = (scalex, scaley) => (raster,copy_mode=true) => console.log('TODO: scale');
 
 /**
   * Translate
   */
-  const translate = (angle) => (img,copy_mode=true) => console.log('TODO: translate');
+const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: translate');
 
 
 // Exports
-
+export {fillColor,fill};
 </code></pre>
         </article>
     </section>
@@ -105,13 +154,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-geometry.html">geometry</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render.html">render</a></li><li><a href="module-statistics.html">statistics</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="TVolume.html">TVolume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#getRaster">getRaster</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pad">pad</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setPixels">setPixels</a></li><li><a href="global.html#setRaster">setRaster</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-geometry.html">geometry</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render.html">render</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="TVolume.html">TVolume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clampUint8">clampUint8</a></li><li><a href="global.html#clampUint16">clampUint16</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#getRaster">getRaster</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pad">pad</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setPixels">setPixels</a></li><li><a href="global.html#setRaster">setRaster</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 13 2017 17:04:26 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 15 2017 08:29:42 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

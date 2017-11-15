@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: process/noise.js</title>
+    <title>JSDoc: Source: render/view.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: process/noise.js</h1>
+    <h1 class="page-title">Source: render/view.js</h1>
 
     
 
@@ -49,27 +49,66 @@
  * Authors:
  * Jean-Christophe Taveau
  */
+
+'use script';
+
+/**
+ * @module view
+ */
  
 /**
- * Add Salt and Pepper Noise
+ * Rectangular view of a single image 
  *
- * @param {number} percent - percentage of noise added to the image
- * @param {TRaster} img - Input image
- * @param {boolean} copy_mode - Used to control the copy (or not) of the image pixels
- * @usage saltAndPepper(0.05)(my_image)
+ * @param {number} x - X-coord of the top-left corner of the rectangle
+ * @param {number} y - Y-coord of the top-left corner of the rectangle
+ * @param {number} w - Width of the rectangle. A value of -1 corresponds to the input width.
+ * @param {number} h - Height rectangle.  A value of -1 corresponds to the input height.
+ * @param {TRaster} img - Input Image
+ * @param {boolean} copy - Copy mode to manage memory usage. Useless, here just for compatibility. 
+ * @returns {TView} Returns a view for rendering
+ *
+ * @author Jean-Christophe Taveau 
+ */
+const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
+  let a_view = new T.View(img.parent.title,img.type,img.width, img.height);
+  if (w === -1 &amp;&amp; h === -1) {
+    a_view.appendLayer({type: 'image', data: img.parent});
+  }
+  else {
+    // TODO - need a crop()
+  }
+  return a_view;
+};
+
+/**
+ * Montage - Convert a stack in a view for rendering
+ *
+ * @param {number} row - Row number
+ * @param {number} column - Column number
+ * @param {number} scale - Scaling of the resulting image
+ * @param {number} border - Border
+ * @param {TStack} stack - Input Stack
+ * @param {boolean} copy - Copy mode to manage memory usage. Useless, here just for compatibility. 
+ * @returns {TView} Returns a view for rendering
  *
  * @author Jean-Christophe Taveau
  */
-const saltAndPepper = (percent=0.05) => {
-  return function (img,copy_mode = true) {
-    let output = TRaster.from(img,copy_mode);
-    let pixels = output.pixelData;
-    let len = img.length;
-    let arr = Array.from({length: Math.floor(len * percent)}, x => Math.random() * len)
-      .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );      
-    return output;
-  }
+const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
+  console.log('TODO: montage(row,column,scale,border)');
+  let view = new T.View('montage',stack.type,stack.width * column, stack.height * row);
+  // Create Image
+  let output = new T.Image('montage',stack.type,stack.width * column, stack.height * row);
+  stack.slices.forEach( (sli,index) => output.raster.pad( (index % column) * stack.width, Math.floor(index/ column) * stack.height,sli) );
+  view.appendLayer({type: 'image',data: output});
+  // Create Labels
+  let labels = [{type: 'text',x:0,y:0,content: 'Test'}];
+  view.appendLayer({type: 'graphics',data: labels});
+  return view;
 };
+
+
+// Exports
+export {montage,view};
 </code></pre>
         </article>
     </section>

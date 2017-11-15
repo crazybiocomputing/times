@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: process/noise.js</title>
+    <title>JSDoc: Source: render/renderVector.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: process/noise.js</h1>
+    <h1 class="page-title">Source: render/renderVector.js</h1>
 
     
 
@@ -49,27 +49,28 @@
  * Authors:
  * Jean-Christophe Taveau
  */
+
+/**
+ * Functions used to render image in a HTML5 web page
+ * @module render
+ */
  
 /**
- * Add Salt and Pepper Noise
+ * Display Vectorial Data
  *
- * @param {number} percent - percentage of noise added to the image
- * @param {TRaster} img - Input image
- * @param {boolean} copy_mode - Used to control the copy (or not) of the image pixels
- * @usage saltAndPepper(0.05)(my_image)
+ * @param {TWindow} win - Window used to display the image in the HTML5 page
+ * @param {TImage} uint8 - Image containing uint8 pixels data
+ * @param {boolean} copy - Useless. Just here for compatibility with other process/render functions.
  *
  * @author Jean-Christophe Taveau
  */
-const saltAndPepper = (percent=0.05) => {
-  return function (img,copy_mode = true) {
-    let output = TRaster.from(img,copy_mode);
-    let pixels = output.pixelData;
-    let len = img.length;
-    let arr = Array.from({length: Math.floor(len * percent)}, x => Math.random() * len)
-      .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );      
-    return output;
-  }
+const renderVector = (win) => (obj,copy=true) => {
+  console.log('renderVector');
 };
+
+// Exports
+export {renderVector}; 
+
 </code></pre>
         </article>
     </section>

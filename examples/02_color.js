@@ -17,11 +17,12 @@ T.splitChannels(T.red,T.green,T.blue, T.hue, T.saturation, T.value,T.luminance, 
 T.montage(3,3)
 );
 
+// Run the pipe and put the resulting view in the variable view
 let view = workflow(img.raster);
 
 // Render
 let win = new T.Window('clown',view.width,view.height);
-T.renderUint8(win)(view.raster);
+view.render(win);
 
-// show() - Add canvas to the workspace in DOM
+// win.showIn('workspace') - Add canvas to the workspace in DOM
 document.getElementById('workspace').appendChild(win.HTMLelement);
