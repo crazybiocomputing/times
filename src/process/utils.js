@@ -21,7 +21,9 @@
  * Authors:
  * Jean-Christophe Taveau
  */
- 
+
+'use script';
+
 /**
  * Extract alpha (transparency) component of RGBA pixel value
  */
@@ -29,6 +31,29 @@ const append = function (obj) {
   TIMES.storage.push(obj);
   return TIMES.storage;
 }
+
+/**
+ * Clamp value between min and max
+ *
+ * @author Jean-Christophe Taveau
+ */
+const clamp = (min_value,max_value) => (value) => Math.max(min_value,Math.min(value,max_value));
+
+
+/**
+ * Clamp value between 0 and 255 (2^8 -1)
+ *
+ * @author Jean-Christophe Taveau
+ */
+const clampUint8 = clamp(0,255);
+
+
+/**
+ * Clamp value between 0 and 65535 (2^16 -1)
+ *
+ * @author Jean-Christophe Taveau
+ */
+const clampUint16 = clamp(0,65535);
 
 
 /**
@@ -39,9 +64,9 @@ const append = function (obj) {
  *
  * @author Eric Elliott
  */
-const pipe = (...fns) => x => fns.reduce((v, f) => f(v), x);
+const pipe = (...fns) => x => fns.reduce((v, f) => f(v,false), x);
 
 
 // Exports
-export {pipe};
+export {clamp,pipe};
 
