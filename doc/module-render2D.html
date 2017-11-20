@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: filters</title>
+    <title>JSDoc: Module: render2D</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Module: filters</h1>
+    <h1 class="page-title">Module: render2D</h1>
 
     
 
@@ -29,6 +29,8 @@
 <header>
     
         
+            
+        
     
 </header>
 
@@ -36,6 +38,82 @@
     <div class="container-overview">
     
         
+            <div class="description">Functions used to render image in a HTML5 web page</div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="render_render2D.js.html">render/render2D.js</a>, <a href="render_render2D.js.html#line25">line 25</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         
     
@@ -64,7 +142,7 @@
     
 
     
-    <h4 class="name" id="~convolve"><span class="type-signature">(inner) </span>convolve<span class="signature">(kernel, img, copy)</span><span class="type-signature"> &rarr; {TRaster}</span></h4>
+    <h4 class="name" id="~renderRGBA"><span class="type-signature">(inner) </span>renderRGBA<span class="signature">(win, img, copy)</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +150,7 @@
 
 
 <div class="description">
-    Convolve operation
+    Display RGBA image
 </div>
 
 
@@ -108,13 +186,13 @@
 
         <tr>
             
-                <td class="name"><code>kernel</code></td>
+                <td class="name"><code>win</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">TRaster</span>
+<span class="param-type">TWindow</span>
 
 
             
@@ -124,7 +202,7 @@
 
             
 
-            <td class="description last">Convolution mask</td>
+            <td class="description last">Window used to display the image in the HTML5 page</td>
         </tr>
 
     
@@ -137,7 +215,7 @@
             <td class="type">
             
                 
-<span class="param-type">TRaster</span>
+<span class="param-type">TImage</span>
 
 
             
@@ -147,7 +225,7 @@
 
             
 
-            <td class="description last">Input image to process</td>
+            <td class="description last">Image containing RGBA pixels data</td>
         </tr>
 
     
@@ -170,7 +248,7 @@
 
             
 
-            <td class="description last">Copy mode to manage memory usage</td>
+            <td class="description last">Useless. Just here for compatibility with other process/render functions.</td>
         </tr>
 
     
@@ -204,7 +282,7 @@
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
-            <li>TODO</li>
+            <li>Jean-Christophe Taveau</li>
         </ul>
     </dd>
     
@@ -218,7 +296,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_filters.js.html">process/filters.js</a>, <a href="process_filters.js.html#line39">line 39</a>
+        <a href="render_render2D.js.html">render/render2D.js</a>, <a href="render_render2D.js.html#line64">line 64</a>
     </li></ul></dd>
     
 
@@ -241,28 +319,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    - Filtered Image
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">TRaster</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 
@@ -274,7 +330,7 @@
     
 
     
-    <h4 class="name" id="~gaussBlur"><span class="type-signature">(inner) </span>gaussBlur<span class="signature">(kernel, img, copy)</span><span class="type-signature"> &rarr; {TRaster}</span></h4>
+    <h4 class="name" id="~renderUint8"><span class="type-signature">(inner) </span>renderUint8<span class="signature">(win, uint8, copy)</span><span class="type-signature"></span></h4>
     
 
     
@@ -282,7 +338,7 @@
 
 
 <div class="description">
-    Gaussian Blur Filter
+    Display uint8 image
 </div>
 
 
@@ -318,13 +374,13 @@
 
         <tr>
             
-                <td class="name"><code>kernel</code></td>
+                <td class="name"><code>win</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">TRaster</span>
+<span class="param-type">TWindow</span>
 
 
             
@@ -334,20 +390,20 @@
 
             
 
-            <td class="description last">Convolution mask</td>
+            <td class="description last">Window used to display the image in the HTML5 page</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>img</code></td>
+                <td class="name"><code>uint8</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">TRaster</span>
+<span class="param-type">TImage</span>
 
 
             
@@ -357,7 +413,7 @@
 
             
 
-            <td class="description last">Input image to process</td>
+            <td class="description last">Image containing uint8 pixels data</td>
         </tr>
 
     
@@ -380,7 +436,7 @@
 
             
 
-            <td class="description last">Copy mode to manage memory usage</td>
+            <td class="description last">Useless. Just here for compatibility with other process/render functions.</td>
         </tr>
 
     
@@ -414,7 +470,7 @@
     <dt class="tag-author">Author:</dt>
     <dd class="tag-author">
         <ul>
-            <li>TODO</li>
+            <li>Jean-Christophe Taveau</li>
         </ul>
     </dd>
     
@@ -428,7 +484,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_filters.js.html">process/filters.js</a>, <a href="process_filters.js.html#line55">line 55</a>
+        <a href="render_render2D.js.html">render/render2D.js</a>, <a href="render_render2D.js.html#line39">line 39</a>
     </li></ul></dd>
     
 
@@ -451,28 +507,6 @@
 
 
 
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    - Filtered Image
-</div>
-
-
-
-<dl>
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">TRaster</span>
-
-
-    </dd>
-</dl>
-
-    
 
 
 

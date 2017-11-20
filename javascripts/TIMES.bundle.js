@@ -137,7 +137,10 @@ const clampUint16 = clamp(0,65535);
  *
  * @author Eric Elliott
  */
-const pipe = (...fns) => x => fns.reduce((v, f) => f(v,false), x);
+const pipe = (...fns) => (x,copy_mode=false) => fns.reduce((v, f,i) => {
+  return f(v,copy_mode);
+  }, x);
+
 
 
 // Exports
@@ -159,9 +162,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__process_utils__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_color__ = __webpack_require__(7);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__process_geometry__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__render_view__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__render_render2D__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__render_renderVector__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_math__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_noise__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__render_view__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__render_render2D__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__render_renderVector__ = __webpack_require__(13);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Raster", function() { return __WEBPACK_IMPORTED_MODULE_0__Raster__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return __WEBPACK_IMPORTED_MODULE_1__Image__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Stack", function() { return __WEBPACK_IMPORTED_MODULE_2__Stack__["a"]; });
@@ -178,17 +183,21 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["f"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["m"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["j"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toABGR", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["k"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_8__render_view__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_8__render_view__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_9__render_render2D__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_9__render_render2D__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_9__render_render2D__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_10__render_renderVector__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_8__process_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_9__process_noise__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_12__render_renderVector__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -229,16 +238,16 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* Process/geometry */
 
 
+/* Process/math */
+
+
+/* Process/noise */
+
+
 /* Render/view */
 
 
 /* Render */
-
-
-
-
-
- 
 
 
 
@@ -322,6 +331,11 @@ class Raster {
      * Pixels array
      */
     this.pixelData; 
+    
+    /**
+     * Image, Stack or Volume parent
+     */
+    this.parent; 
   }
   
   /*
@@ -361,6 +375,7 @@ class Raster {
    */
   static from(other, copy = true) {
     let img = new T.Raster(other.type,other.width, other.height);
+    img.parent = other.parent;
     img.pixelData = (copy === true) ? [...other.pixelData] : other.pixelData; // Copy pixels
     return img;
   }
@@ -525,18 +540,14 @@ class Raster {
  
 class Image {
   /**
-   * Create an empty TImage.
+   * Create an empty Image.
    * 
    * @param {string} type - One of these: uint8, uint16, float32, rgba
    * @param {number} width - Image Width
    * @param {number} height - Image Height
    * @param {number} offset - Offset
    */
-  constructor(title,type,width,height, pattern="black") {
-    /**
-     * Title
-     */
-    this.title = title;
+  constructor(type,width,height, pattern="black") {
     
     /**
      * Width
@@ -564,7 +575,6 @@ class Image {
      */
     this.metadata = {
       dimension : 2,
-      title : title,
       type: type,
       width : width,
       height : height,
@@ -602,6 +612,9 @@ class Image {
   /**
    * Get raster
    *
+   * @alias T.Image~getRaster
+   * @return {Raster} Returns the raster
+   *
    * @author Jean-Christophe Taveau
    */
   getRaster() {
@@ -610,6 +623,9 @@ class Image {
 
   /**
    * Set raster
+   *
+   * @alias T.Image~setRaster
+   * @param {Raster} a_raster - A raster image
    *
    * @author Jean-Christophe Taveau
    */
@@ -620,16 +636,14 @@ class Image {
   /**
    * Set pixels
    *
+   * @alias T.Image~setPixels
+   * @param {array} data - Array of pixel values (numbers)
    * @author Jean-Christophe Taveau
    */
   setPixels(data) {
     this.raster.pixelData = data;
   }
   
-  setWindow(win) {
-    this.window = win;
-  }
-
   setWindow(win) {
     this.window = win;
   }
@@ -821,49 +835,178 @@ class Stack {
  * Jean-Christophe Taveau
  */
 
+/**
+ * Class for Window
+ * @alias T.Window
+ */
+ 
 class Window {
-  constructor(title, width,height, forceCPU=true) {
+  /**
+   * Create an empty Window.
+   * 
+   * @param {string} title - Window Title
+   * @param {number} width - Window Width
+   * @param {number} height - Window Height
+   * @param {boolean} forceCPU - By default, all the processing is done in CPU and not in GPU
+   *
+   * @author Jean-Christophe Taveau
+   */
+  constructor(title,forceCPU=true) {
+    /**
+     * Title
+     */
     this.title = title;
-    this.width = width;
-    this.height = height;
+    
     
     // Build HTML5 elements
-    this.HTMLelement = document.createElement('div');
-    this.HTMLelement.name = this.title;
-    this.HTMLelement.id = this.title.toLowerCase(); //  + '-' + wm.windows.length;
-    this.canvas = document.createElement('canvas');
-    this.HTMLelement.appendChild(this.canvas);
+    this.root = document.createElement('article');
+    this.root.className = "twindow";
+    this.root.name = this.title;
+    this.root.id = this.title.toLowerCase(); //  + '-' + wm.windows.length;
+    this.root.style.left = `${Math.random()*1200}px`;
+    this.root.style.top = `${Math.random()*400}px`;
+    let header = document.createElement('header');
+    header.className = 'theader';
+    header.innerHTML = `<label>${title}</label>`;
+    this.root.appendChild(header);
+    let body = document.createElement('content');
+    let footer = document.createElement('footer');
+    footer.className = 'tfooter';
+    this.root.appendChild(header);
+    this.root.appendChild(body);
+    this.root.appendChild(footer);
 
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
+    // Move by click & drag 
+    let offset = [];
+    const move = (e) => {
+      header.parentNode.style.top  = (e.clientY + offset[1]) + 'px';
+      header.parentNode.style.left = (e.clientX + offset[0]) + 'px';
+    };
+    const mouseUp = (e) => {
+      e.target.parentNode.style.zIndex = 1;
+      window.removeEventListener('mousemove', move, true);
+    }
+    const mouseDown = (e) => {
+      e.target.parentNode.style.zIndex = 99;
+      offset = [this.root.offsetLeft - e.clientX, this.root.offsetTop - e.clientY];
+      window.addEventListener('mousemove', move, true);
+    }
+    header.addEventListener('mousedown', mouseDown, false);
+    window.addEventListener('mouseup', mouseUp, false);
+
+    this.element;
+    
+
 
     // Try to get HW Acceleration
-    this.useGPU = false;
+    this.useGPU = !forceCPU;
+    /*
     if (!forceCPU) {
       // Get WEBLG 2 context
       this.ctx = this.canvas.getContext("webgl2");
       // no webgl2 for you!
       this.useGPU = (!this.ctx) ? false : true;
     }
-    if (!this.useGPU && forceCPU) {
+    if (!this.useGPU) {
       this.ctx = this.canvas.getContext('2d');
       this.useGPU = false;
     }
+    */
   }
 
-  getImage() {
-    return (this.metadata.dimension === 2) ? this.content : undefined;
+  /**
+   * Add a view to this window
+   *
+   * @alias T.Window~addView
+   * @param {View} a_view - View
+   *
+   * @author Jean-Christophe Taveau
+   */
+  addView(a_view) {
+    /*
+     * Create an empty canvas
+     */
+    const createCanvas = (layerData) => {
+      let canvas = document.createElement('canvas');
+      canvas.layerData = layerData;
+      this.element = canvas;
+      
+      if (!this.useGPU) {
+        this.ctx = this.element.getContext('2d');
+      }
+      // HACK console.log(`${layerData.width} x ${layerData.height} `);
+      canvas.width = layerData.width;
+      canvas.height = layerData.height;
+      this.root.childNodes[1].appendChild(canvas);
+      let info = document.createElement('p'); 
+      info.className = 'tstatus';
+      info.id = this.root.id + '_status';
+      info.appendChild(document.createTextNode('') );
+      this.root.childNodes[2].appendChild(info);
+
+      // Add events
+      // TODO - What about CSS geometric transforms?
+      // See https://stackoverflow.com/questions/17130395/real-mouse-position-in-canvas
+      canvas.addEventListener('mousemove', function(evt) {
+        let canvas = evt.target;
+        let the_view = evt.target.parentNode.parentNode.tview;
+        let rect = canvas.getBoundingClientRect();
+        let x = Math.floor(evt.clientX - rect.left);
+        let y = Math.floor(evt.clientY - rect.top);
+        let pixels = canvas.layerData.raster.pixelData;
+        let w = canvas.layerData.raster.width;
+        let pix = pixels[x + y * w];
+        let message = `(${x},${y}): ${pix}`;
+        if (the_view.layers[0].data.raster.type === 'rgba') {
+          message = `(${x},${y}): #${pix.toString(16)} (${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
+        }
+        let info = canvas.parentNode.nextSibling;
+        info.innerHTML = message;
+      });
+      // TODO Zoom in/out
+      // TODO http://phrogz.net/tmp/canvas_zoom_to_cursor.html
+      // TODO this.ctx.scale(2.0,2.0);
+      // TODO Translate canvas
+      // TODO this.ctx.translate(10.0,20.0)
+      // TODO this.ctx.drawImage(win.canvas,0,0);
+    };
+
+    /* 
+     * Create an empty table
+     */
+    const createTable = () => {
+      this.element = document.createElement('table');
+      this.root.childNodes[1].appendChild(this.element);
+    };
+  
+    // M A I N
+    this.root.tview = a_view;
+    // Create all the HTML5 stuff...
+    for (let layer of a_view.layers) {
+      switch (layer.type) {
+        case 'image':
+        createCanvas(layer.data);
+        break;
+      case 'table': 
+        createTable(layer.data);
+        break;
+      default: // Unknown
+        // TODO
+      }
+    }
   }
-
-
-  getStack() {
-    return (this.metadata.dimension === 2.5) ? this.content : undefined;
-  }
-
-
-  getVolume () {
-    return (this.metadata.dimension === 3) ? this.content :  undefined;
-  }
+  
+  /**
+   * Add this window to DOM and display its contents
+   *
+   * @alias T.Window~addToDOM
+   * @author Jean-Christophe Taveau
+   */
+   addToDOM(parent) {
+    this.root.tview.render(this);
+    // show() - Add canvas to the workspace in DOM
+    document.getElementById(parent).appendChild(this.root);
+   }
 
 }
 /* harmony export (immutable) */ __webpack_exports__["a"] = Window;
@@ -978,8 +1121,9 @@ class View {
 /* unused harmony export average */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return hue; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return saturation; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return value; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return value; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return toABGR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return toRGBA; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return splitChannels; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils__ = __webpack_require__(0);
 /*
@@ -1222,8 +1366,9 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fillColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return fill; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return crop; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return fillColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fill; });
 /*
  *  times: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -1255,6 +1400,30 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
  */
 
 /**
+  * Crop raster 
+  * @param {number} topleft_x - X-coordinate of the top left corner
+  * @param {number} topleft_y - Y-coordinate of the top left corner
+  * @param {number} new_width - Width of the cropped raster
+  * @param {number} new_height - Height of the cropped raster
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const crop = (top_left_x, top_left_y,new_width,new_height) => (raster,copy_mode=true) => {
+  let output = T.Raster.from(raster,false);
+  let pixels = Array.from({length: new_height}, (v,i) => top_left_x + (top_left_y + i) * raster.width)
+    .reduce( (accu,xy) => {
+      let chunk = raster.pixelData.slice( xy, xy + new_width);
+      return [...accu, ...chunk];
+    },[]);
+  output.width = new_width;
+  output.height = new_height;
+  output.pixelData = [...pixels];
+  return output;
+}
+  
+/**
   * Fill with the pixel gray or color value depending of the raster type
   * @param {number} value - A gray or color value
   * @param {Raster} raster - Input Raster
@@ -1282,6 +1451,28 @@ const fillPattern = (keyword) => (raster,copy_mode=true) => {
   
 /**
   * Fill with values calculated from a function
+  *
+  * @param {function} func - A function
+  * <p>The function may take a maximum of nine arguments:</p>
+  * <ul>
+  * <li>pix - Pixel value</li>
+  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+  * <li>x - X-coordinate of pix</li>
+  * <li>y - Y-coordinate of pix</li>
+  * <li>z - Z-coordinate of pix if raster is in 3D</li>
+  * <li>w - Width of raster</li>
+  * <li>h - Height of raster</li>
+  * <li>a - Angle calculated as atan2(y/x)</li>
+  * <li>d - Distance to the center</li>
+  * </ul>
+  * @example <caption>Fill with a spiral</caption>
+  * const DEG = Math.PI / 180;
+  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+  * let raster = T.fill(spiral)(img.getRaster() );
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
   */
 const fill = (func) => (raster,copy_mode=true) => {
   let w = raster.width;
@@ -1312,7 +1503,8 @@ const flipV = (angle) => (raster,copy_mode=true) => console.log('TODO: flipV');
 const flipH = (angle) => (raster,copy_mode=true) => console.log('TODO: flipH');
 
 /**
-  * Pad
+  * Pad - <strong>TODO</strong>
+  * 
   */
 const pad = (topleft_x,topleft_y,new_width, new_height,value) => (img,copy_mode=true) => {
   let output = new T.Raster(img.type,new_width,new_height);
@@ -1346,6 +1538,155 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 /***/ }),
 /* 9 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return calc; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+/**
+ * @module math
+ */
+ 
+/**
+  * Fill with values calculated from a function
+  *
+  * @param {function} func - A function
+  * <p>The function may take a maximum of nine arguments:</p>
+  * <ul>
+  * <li>pix - Pixel value</li>
+  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+  * <li>x - X-coordinate of pix</li>
+  * <li>y - Y-coordinate of pix</li>
+  * <li>z - Z-coordinate of pix if raster is in 3D</li>
+  * <li>w - Width of raster</li>
+  * <li>h - Height of raster</li>
+  * <li>a - Angle calculated as atan2(y/x)</li>
+  * <li>d - Distance to the center</li>
+  * </ul>
+  * @example <caption>Fill with a spiral</caption>
+  * const DEG = Math.PI / 180;
+  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+  * let raster = T.fill(spiral)(img.getRaster() );
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const calc = (func) => (raster,copy_mode=true) => {
+  let output = T.Raster.from(raster,copy_mode);
+  let w = output.width;
+  let h = output.height;
+  let cx = h / 2.0;
+  let cy = h / 2.0;
+  
+  output.pixelData.forEach ( (px,i,arr) => {
+    let x = i % w;
+    let y = Math.floor(i / w);
+    let z = Math.floor( i / w / h);
+    let d = Math.sqrt ((x-cx)**2 + (y -cy)**2);
+    let a = Math.atan2(y,x);
+    output.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+  });
+  return output;
+};
+
+/**
+ * Add a constant value to all the raster pixels
+ * 
+ * @param {number} v - Constant value
+ * @param {Raster} img - Input image
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {object} - Returns an object containing min, max, mean, variance
+ *
+ * @author Jean-Christophe Taveau
+ */
+const addK = (v) => (img, copy_mode = true) => {
+  let output = T.Raster.from(img,copy_mode);
+  output.pixelData.forEach( (px) => px + v);
+};
+
+
+// EXport
+
+
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return saltAndPepper; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+/**
+ * Add Salt and Pepper Noise
+ *
+ * @param {number} percent - percentage of noise added to the image
+ * @param {Raster} raster - Input image
+ * @param {boolean} copy_mode - Used to control the copy (or not) of the image pixels
+ * @usage saltAndPepper(0.05)(my_image)
+ *
+ * @author Jean-Christophe Taveau
+ */
+const saltAndPepper = (percent=0.05) => (raster,copy_mode = true) => {
+  let output = T.Raster.from(raster,copy_mode);
+  let pixels = output.pixelData;
+  Array.from({length: Math.floor(raster.length * percent)}, x => Math.floor(Math.random() * raster.length) )
+    .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );
+  return output;
+};
+
+
+
+
+/***/ }),
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1394,14 +1735,15 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
  *
  * @author Jean-Christophe Taveau 
  */
-const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
-  let a_view = new T.View(img.parent.title,img.type,img.width, img.height);
-  if (w === -1 && h === -1) {
-    a_view.appendLayer({type: 'image', data: img.parent});
-  }
-  else {
-    // TODO - need a crop()
-  }
+const view = (raster,copy_mode=true) => {
+  // Update raster in parent (Image, Stack or Volume?))
+  raster.parent.setRaster(raster);
+  raster.parent.width = raster.width;
+  raster.parent.height = raster.height;
+  raster.parent.type = raster.type;
+  // HACK let img = new T.Image('view',raster.type,raster.width, raster.height);
+  let a_view = new T.View('view',raster.type,raster.width, raster.height);
+  a_view.appendLayer({type: 'image', data: raster.parent});
   return a_view;
 };
 
@@ -1419,10 +1761,9 @@ const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
  * @author Jean-Christophe Taveau
  */
 const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
-  console.log('TODO: montage(row,column,scale,border)');
   let view = new T.View('montage',stack.type,stack.width * column, stack.height * row);
   // Create Image
-  let output = new T.Image('montage',stack.type,stack.width * column, stack.height * row);
+  let output = new T.Image(stack.type,stack.width * column, stack.height * row);
   stack.slices.forEach( (sli,index) => output.raster.pad( (index % column) * stack.width, Math.floor(index/ column) * stack.height,sli) );
   view.appendLayer({type: 'image',data: output});
   // Create Labels
@@ -1437,7 +1778,7 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1470,7 +1811,7 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
 
 /**
  * Functions used to render image in a HTML5 web page
- * @module render
+ * @module render2D
  */
  
 /**
@@ -1484,15 +1825,14 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
  */
 const renderUint8 = (win) => (img8bit,copy=true) => {
   // Tutorial: https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
-  let imgdata = win.ctx.createImageData(win.width, win.height);
+  let imgdata = win.ctx.createImageData(img8bit.width, img8bit.height);
 
   // New RGBA image buffer
-  let buf = new ArrayBuffer(win.width * win.height * 4);
+  let buf = new ArrayBuffer(img8bit.width * img8bit.height * 4);
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
   buf32.forEach( (px,i,arr) => arr[i] = T.toABGR(img8bit.pixelData[i],img8bit.pixelData[i],img8bit.pixelData[i],255) );
-  console.log(buf32);
 
   imgdata.data.set(buf8);
   win.ctx.putImageData(imgdata, 0, 0);
@@ -1510,10 +1850,10 @@ const renderUint8 = (win) => (img8bit,copy=true) => {
  */
 const renderRGBA = (win) => (img,copy=true) => {
   // Tutorial: https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
-  let imgdata = win.ctx.createImageData(win.width, win.height);
+  let imgdata = win.ctx.createImageData(img.width, img.height);
 
   // New RGBA image buffer
-  let buf = new ArrayBuffer(win.width * win.height * 4);
+  let buf = new ArrayBuffer(img.width * img.height * 4);
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
@@ -1527,10 +1867,10 @@ const render2D = (win) => (img,copy=true) => {
   console.log(win);
   switch (img.raster.type) {
   case 'uint8':
-    renderUint8(win)(img.raster);
+    T.renderUint8(win)(img.raster);
     break;
   case 'rgba':
-    renderRGBA(win)(img.raster);
+    T.renderRGBA(win)(img.raster);
     break;
   }
 };
@@ -1541,7 +1881,7 @@ const render2D = (win) => (img,copy=true) => {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1570,9 +1910,11 @@ const render2D = (win) => (img,copy=true) => {
  * Jean-Christophe Taveau
  */
 
+'use script';
+
 /**
- * Functions used to render image in a HTML5 web page
- * @module render
+ * Functions used to render vectorial data in a HTML5 web page
+ * @module renderVector
  */
  
 /**

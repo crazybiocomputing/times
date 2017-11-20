@@ -64,7 +64,7 @@
     
 
     
-    <h4 class="name" id="~fill"><span class="type-signature">(inner) </span>fill<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="~crop"><span class="type-signature">(inner) </span>crop<span class="signature">(topleft_x, topleft_y, new_width, new_height, raster, copy_mode)</span><span class="type-signature"></span></h4>
     
 
     
@@ -72,7 +72,7 @@
 
 
 <div class="description">
-    Fill with values calculated from a function
+    Crop raster
 </div>
 
 
@@ -81,6 +81,170 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>topleft_x</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">X-coordinate of the top left corner</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>topleft_y</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Y-coordinate of the top left corner</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>new_width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Width of the cropped raster</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>new_height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Height of the cropped raster</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>raster</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Raster</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input Raster</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>copy_mode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Useless, here. Only for compatibility with other process functions</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -106,6 +270,13 @@
     
 
     
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Jean-Christophe Taveau</li>
+        </ul>
+    </dd>
+    
 
     
 
@@ -116,7 +287,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line60">line 60</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line42">line 42</a>
     </li></ul></dd>
     
 
@@ -141,6 +312,215 @@
 
 
 
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="~fill"><span class="type-signature">(inner) </span>fill<span class="signature">(func, raster, copy_mode)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Fill with values calculated from a function
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>func</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">A function
+<p>The function may take a maximum of nine arguments:</p>
+<ul>
+<li>pix - Pixel value</li>
+<li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+<li>x - X-coordinate of pix</li>
+<li>y - Y-coordinate of pix</li>
+<li>z - Z-coordinate of pix if raster is in 3D</li>
+<li>w - Width of raster</li>
+<li>h - Height of raster</li>
+<li>a - Angle calculated as atan2(y/x)</li>
+<li>d - Distance to the center</li>
+</ul></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>raster</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Raster</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Input Raster</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>copy_mode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Useless, here. Only for compatibility with other process functions</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-author">Author:</dt>
+    <dd class="tag-author">
+        <ul>
+            <li>Jean-Christophe Taveau</li>
+        </ul>
+    </dd>
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line106">line 106</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Example</h5>
+    
+        <p class="code-caption">Fill with a spiral</p>
+    
+    <pre class="prettyprint"><code>const DEG = Math.PI / 180;
+const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+let raster = T.fill(spiral)(img.getRaster() );</code></pre>
 
 
 
@@ -304,7 +684,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line39">line 39</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line63">line 63</a>
     </li></ul></dd>
     
 
@@ -492,7 +872,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line53">line 53</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line77">line 77</a>
     </li></ul></dd>
     
 
@@ -578,7 +958,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line86">line 86</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -664,7 +1044,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line81">line 81</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line127">line 127</a>
     </li></ul></dd>
     
 
@@ -706,7 +1086,7 @@
 
 
 <div class="description">
-    Pad
+    Pad - <strong>TODO</strong>
 </div>
 
 
@@ -750,7 +1130,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line91">line 91</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line138">line 138</a>
     </li></ul></dd>
     
 
@@ -836,7 +1216,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line104">line 104</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line151">line 151</a>
     </li></ul></dd>
     
 
@@ -922,7 +1302,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line109">line 109</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line156">line 156</a>
     </li></ul></dd>
     
 
@@ -1008,7 +1388,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line114">line 114</a>
+        <a href="process_geometry.js.html">process/geometry.js</a>, <a href="process_geometry.js.html#line161">line 161</a>
     </li></ul></dd>
     
 
@@ -1052,13 +1432,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-geometry.html">geometry</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render.html">render</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="TVolume.html">TVolume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clampUint8">clampUint8</a></li><li><a href="global.html#clampUint16">clampUint16</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#getRaster">getRaster</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pad">pad</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#setPixels">setPixels</a></li><li><a href="global.html#setRaster">setRaster</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-analyze.html">analyze</a></li><li><a href="module-color.html">color</a></li><li><a href="module-edgeDetect.html">edgeDetect</a></li><li><a href="module-filters.html">filters</a></li><li><a href="module-geometry.html">geometry</a></li><li><a href="module-hough.html">hough</a></li><li><a href="module-math.html">math</a></li><li><a href="module-rankFilters.html">rankFilters</a></li><li><a href="module-render2D.html">render2D</a></li><li><a href="module-renderVector.html">renderVector</a></li><li><a href="module-statistics.html">statistics</a></li><li><a href="module-type.html">type</a></li><li><a href="module-view.html">view</a></li></ul><h3>Classes</h3><ul><li><a href="T.Image.html">Image</a></li><li><a href="T.Raster.html">Raster</a></li><li><a href="T.Stack.html">Stack</a></li><li><a href="T.Window.html">Window</a></li><li><a href="Volume.html">Volume</a></li></ul><h3>Namespaces</h3><ul><li><a href="T.html">T</a></li></ul><h3>Global</h3><ul><li><a href="global.html#append">append</a></li><li><a href="global.html#clamp">clamp</a></li><li><a href="global.html#clampUint8">clampUint8</a></li><li><a href="global.html#clampUint16">clampUint16</a></li><li><a href="global.html#erode">erode</a></li><li><a href="global.html#forEach">forEach</a></li><li><a href="global.html#hft">hft</a></li><li><a href="global.html#map">map</a></li><li><a href="global.html#otsu">otsu</a></li><li><a href="global.html#pad">pad</a></li><li><a href="global.html#pipe">pipe</a></li><li><a href="global.html#saltAndPepper">saltAndPepper</a></li><li><a href="global.html#set">set</a></li><li><a href="global.html#slice">slice</a></li><li><a href="global.html#threshold">threshold</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Wed Nov 15 2017 08:29:42 GMT+0100 (CET)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Nov 20 2017 17:23:46 GMT+0100 (CET)
 </footer>
 
 <script> prettyPrint(); </script>

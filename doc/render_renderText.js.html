@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: process/noise.js</title>
+    <title>JSDoc: Source: render/renderText.js</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Source: process/noise.js</h1>
+    <h1 class="page-title">Source: render/renderText.js</h1>
 
     
 
@@ -49,26 +49,62 @@
  * Authors:
  * Jean-Christophe Taveau
  */
- 
+
+'use script';
+
 /**
- * Add Salt and Pepper Noise
- *
- * @param {number} percent - percentage of noise added to the image
- * @param {Raster} raster - Input image
- * @param {boolean} copy_mode - Used to control the copy (or not) of the image pixels
- * @usage saltAndPepper(0.05)(my_image)
- *
- * @author Jean-Christophe Taveau
+ * Functions used to render vectorial data in a HTML5 web page
+ * @module renderVector
  */
-const saltAndPepper = (percent=0.05) => (raster,copy_mode = true) => {
-  let output = T.Raster.from(raster,copy_mode);
-  let pixels = output.pixelData;
-  Array.from({length: Math.floor(raster.length * percent)}, x => Math.floor(Math.random() * raster.length) )
-    .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );
-  return output;
+
+/**
+ * Display Vectorial Data
+ * From http://jsfiddle.net/ondras/hYfN3/
+ * @author Ondřej Žára
+ */
+const renderTable = (win) => (csv,copy=true) => {
+    let table = win.element;
+    let rows = csv.split('\n');
+    console.log('renderTable');
+    // Fill in the table
+    for (let i=0; i&lt; rows.length; i++) {
+        let row = table.insertRow(-1);
+        let cells = row.split(',');
+        for (let j=0; j&lt; cells.length; j++) {
+            let letter = String.fromCharCode("A".charCodeAt(0)+j-1);
+            row.insertCell(-1).innerHTML = i&amp;&amp;j ? "&lt;input id='"+ letter+i +"'/>" : i||letter;
+        }
+    }
+    
+    // Add events
+/*
+    var DATA={}, INPUTS=[].slice.call(document.querySelectorAll("input"));
+    INPUTS.forEach(function(elm) {
+        elm.onfocus = function(e) {
+            e.target.value = localStorage[e.target.id] || "";
+        };
+        elm.onblur = function(e) {
+            localStorage[e.target.id] = e.target.value;
+            computeAll();
+        };
+        var getter = function() {
+            var value = localStorage[elm.id] || "";
+            if (value.charAt(0) == "=") {
+                with (DATA) return eval(value.substring(1));
+            } else { return isNaN(parseFloat(value)) ? value : parseFloat(value); }
+        };
+        Object.defineProperty(DATA, elm.id, {get:getter});
+        Object.defineProperty(DATA, elm.id.toLowerCase(), {get:getter});
+    });
+    (window.computeAll = function() {
+        INPUTS.forEach(function(elm) { try { elm.value = DATA[elm.id]; } catch(e) {} });
+    })();
+*/
 };
 
-export {saltAndPepper};
+// Exports
+export {renderTable}; 
+
 </code></pre>
         </article>
     </section>

@@ -3,7 +3,7 @@
  */
 
 
-let img = new T.Image('clown','rgba',320,200);
+let img = new T.Image('rgba',320,200);
 img.setPixels(clown_pixels);
 
 console.log(img instanceof T.Image);
@@ -21,8 +21,9 @@ T.montage(3,3)
 let view = workflow(img.raster);
 
 // Render
-let win = new T.Window('clown',view.width,view.height);
-view.render(win);
+let win = new T.Window('Clown montage');
 
-// win.showIn('workspace') - Add canvas to the workspace in DOM
-document.getElementById('workspace').appendChild(win.HTMLelement);
+// Create the window content from the view
+win.addView(view);
+// Add the window to the DOM and display it
+win.addToDOM('workspace');
