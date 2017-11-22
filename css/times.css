@@ -45,6 +45,11 @@
   font-size : 0.6em;
   margin: 0px;
   padding: 0px;
+  /* Required for text-overflow */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  
 }
 
 
