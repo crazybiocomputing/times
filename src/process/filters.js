@@ -22,31 +22,38 @@
  * Jean-Christophe Taveau
  */
 
-
 /**
- * <Description>
- *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
- *
- * @author
+ * @module filters
  */
-const convolve = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+ 
+/**
+ * Convolve operation
+ *
+ * @param {TRaster} kernel - Convolution mask
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Filtered Image
+ *
+ * @author TODO
+ */
+const convolve = (kernel) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }
 
 /**
- * <Description>
+ * Gaussian Blur Filter
  *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
+ * @param {TRaster} kernel - Convolution mask
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Filtered Image
  *
- * @author
+ * @author TODO
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+const gaussBlur = (kernel) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }

@@ -26,27 +26,43 @@
 import Raster from './Raster';
 import Image from './Image';
 import Stack from './Stack';
+import Volume from './Volume';
 import Window from './Window';
-
-
-/* Process/color */
-import {red,blue,green,alpha} from './process/color';
-import {luminance} from './process/color';
-import {hue, saturation, value} from './process/color';
-import {toABGR} from './process/color';
-import {splitChannels} from './process/color';
+import View from './View';
 
 /* Process/utils */
-import {pipe} from './process/utils';
+import {clamp,clampUint8,pipe} from './process/utils';
 
-/* Process/view */
-import {montage,view} from './process/view';
+/* Process/color */
+import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toABGR,toRGBA} from './process/color';
+
+/* Process/geometry */
+import {crop} from './process/geometry';
+
+/* Process/math */
+import {black,calc,chessboard,fillColor,fill,math,ramp,spiral,white} from './process/math';
+
+/* Process/noise */
+import {saltAndPepper} from './process/noise';
+
+/* Render/view */
+import {montage,view} from './render/view';
 
 /* Render */
-import {renderUint8,renderRGBA} from './render/render2D';
+import {renderUint8,renderRGBA,render2D} from './render/render2D';
+import {renderVector} from './render/renderVector';
 
-export {Raster,Image,Stack,Window};
-export {red,blue,green,alpha, luminance, hue, saturation, value, splitChannels,toABGR};
-export {pipe};
-export {montage,view};
-export {renderUint8,renderRGBA};
+export {
+  Raster,Image,Stack,Volume,Window,View,
+  clamp,clampUint8,pipe,
+  red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
+  splitChannels,toABGR,toRGBA,
+  crop,
+  black,calc,chessboard,fillColor,fill,math,ramp,spiral,white,
+  saltAndPepper,
+  montage,view,
+  renderUint8,renderRGBA,render2D,
+  renderVector
+};
+
+

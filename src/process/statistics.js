@@ -21,31 +21,36 @@
  * Authors:
  * Jean-Christophe Taveau
  */
+
+/**
+ * @module statistics
+ */
  
 /**
- * Computes basic stats: min, max, mean/average and standard deviation of the image
- * Algorithm for variance found below:
- * https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm
- *
- * @param {TImage} img - Input image
+ * Computes basic stats: min, max, mean/average and standard deviation of the image.
+ * Algorithm for variance found in <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm">Wikipedia</a>
+ * 
+ * @param {Raster} img - Input raster
  * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {object} - Returns an object containing min, max, mean, variance
+ *
  * @author Jean-Christophe Taveau
  */
 const statistics = (img, copy_mode = true) => {
   let tmp = img.pixelData.reduce ( (accu,px,i) => {
-      accu.min = Math.min(accu.min,px);
-      accu.max = Math.max(accu.max,px);
-      accu.mean += px;
-      accu.n++;
-      let delta = px - accu.mean2;
-      accu.mean2 += delta/accu.n;
-      accu.variance += delta * delta;
-      return accu;
-    },
-    {min: Number.MAX_SAFE_INTEGER, max: 0, mean: 0.0, mean2 : 0.0, n: 0, variance: 0.0}
+    accu.min = Math.min(accu.min,px);
+    accu.max = Math.max(accu.max,px);
+    accu.mean += px;
+    accu.n++;
+    let delta = px - accu.mean2;
+    accu.mean2 += delta/accu.n;
+    accu.variance += delta * delta;
+    return accu;
+  },
+  {min: Number.MAX_SAFE_INTEGER, max: 0, mean: 0.0, mean2 : 0.0, n: 0, variance: 0.0}
   );
 
-  // Update stats in this TImage
+  // Update stats in this TRaster
   img.statistics = {
     min: tmp.min,
     max: tmp.max,
@@ -53,6 +58,14 @@ const statistics = (img, copy_mode = true) => {
     mean : tmp.mean / img.pixelData.length,
     stddev : Math.sqrt(tmp.variance / img.pixelData.length)
   };
-  return img.statistics;
-}
+  return img;
+};
+
+const histogram = (binNumber) => (img, copy_mode = true) => {
+  // TODO
+};
+
+// Exports
+export {statistics};
+
 

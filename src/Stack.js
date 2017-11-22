@@ -41,11 +41,7 @@ export default class Stack {
    * @param {number} height - Height
    * @param {number} nslices - Slice number in the stack
    */
-  constructor(title,type,width,height,nslices,pattern="black") {
-    /**
-     * Title
-     */
-    this.title = title;
+  constructor(type,width,height,nslices,pattern="black") {
     
     /**
      * Width
@@ -91,19 +87,19 @@ export default class Stack {
     };
     
     /**
-     * Array of TRaster
+     * Array of slices Raster
      */
     this.slices = Array.from({length: nslices}, (x,i) => new T.Raster(type,width,height,i.toString()));
   }
 
   /**
    * Set pixels
-   *
+   * 
+   * @alias T.Stack~setPixels
    * @author Jean-Christophe Taveau
    */
   setPixels(data) {
-    // TODO
-    this.raster.pixelData = data;
+    this.slices.forEach( (sli,i) => sli.pixelData = data.slice(i*sli.length, i*sli.length + sli.length) );
   }
 
 
@@ -138,10 +134,7 @@ export default class Stack {
    * @author Jean-Christophe Taveau
    */
    slice(index) {
-    let output = this.slices[index];
-    // Copy pixels
-    output.setPixels(this.pixelData.filter( (x,i) => (i >= output.offset && i < output.offset + output.length) ) );
-    return output;
+    return this.slices[index];
    }
 }
 

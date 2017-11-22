@@ -29,72 +29,28 @@
  */
 
 /**
-  * Fill with the pixel gray or color value depending of the raster type
-  * @param {number} value - A gray or color value
+  * Crop raster 
+  * @param {number} topleft_x - X-coordinate of the top left corner
+  * @param {number} topleft_y - Y-coordinate of the top left corner
+  * @param {number} new_width - Width of the cropped raster
+  * @param {number} new_height - Height of the cropped raster
   * @param {Raster} raster - Input Raster
   * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
   *
   * @author Jean-Christophe Taveau
   */
-const fillColor = (value) => (raster,copy_mode=true) => {
-  raster.pixelData.fill(value);
-  return raster;
+const crop = (top_left_x, top_left_y,new_width,new_height) => (raster,copy_mode=true) => {
+  let output = T.Raster.from(raster,false);
+  let pixels = Array.from({length: new_height}, (v,i) => top_left_x + (top_left_y + i) * raster.width)
+    .reduce( (accu,xy) => {
+      let chunk = raster.pixelData.slice( xy, xy + new_width);
+      return [...accu, ...chunk];
+    },[]);
+  output.width = new_width;
+  output.height = new_height;
+  output.pixelData = [...pixels];
+  return output;
 }
-  
-/**
-  * Fill raster with specific patterns
-  *
-  * @param {string} keyword - Pattern among: black, white, ramp, chessboard, noise
-  * @param {Raster} raster - Input Raster
-  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
-  *
-  * @author Jean-Christophe Taveau
-  */
-const fillPattern = (keyword) => (raster,copy_mode=true) => {
-  // TODO
-}
-  
-/**
-  * Fill with values calculated from a function
-  *
-  * @param {function} func - A function
-  * <p>The function may take a maximum of nine arguments:</p>
-  * <ul>
-  * <li>pix - Pixel value</li>
-  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
-  * <li>x - X-coordinate of pix</li>
-  * <li>y - Y-coordinate of pix</li>
-  * <li>z - Z-coordinate of pix if raster is in 3D</li>
-  * <li>w - Width of raster</li>
-  * <li>h - Height of raster</li>
-  * <li>a - Angle calculated as atan2(y/x)</li>
-  * <li>d - Distance to the center</li>
-  * </ul>
-  * @example <caption>Fill with a spiral</caption>
-  * const DEG = Math.PI / 180;
-  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
-  * let raster = T.fill(spiral)(img.getRaster() );
-  * @param {Raster} raster - Input Raster
-  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
-  *
-  * @author Jean-Christophe Taveau
-  */
-const fill = (func) => (raster,copy_mode=true) => {
-  let w = raster.width;
-  let h = raster.height;
-  let cx = h / 2.0;
-  let cy = h / 2.0;
-  
-  raster.pixelData.forEach ( (px,i,arr) => {
-    let x = i % w;
-    let y = Math.floor(i / w);
-    let z = Math.floor( i / w / h);
-    let d = Math.sqrt ((x-cx)**2 + (y -cy)**2);
-    let a = Math.atan2(y,x);
-    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
-  });
-  return raster;
-};
   
 
 /**
@@ -108,7 +64,8 @@ const flipV = (angle) => (raster,copy_mode=true) => console.log('TODO: flipV');
 const flipH = (angle) => (raster,copy_mode=true) => console.log('TODO: flipH');
 
 /**
-  * Pad
+  * Pad - <strong>TODO</strong>
+  * 
   */
 const pad = (topleft_x,topleft_y,new_width, new_height,value) => (img,copy_mode=true) => {
   let output = new T.Raster(img.type,new_width,new_height);
@@ -137,4 +94,4 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 
 // Exports
-export {fillColor,fill};
+export {crop};

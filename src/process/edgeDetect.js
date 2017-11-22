@@ -22,17 +22,23 @@
  * Jean-Christophe Taveau
  */
 
+/**
+ * @module edgeDetect
+ */
+ 
 
 /**
- * <Description>
+ * Sobel
  *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
+ * @param {type} params - Parameters
+ * @param {TRaster} img - Input image
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - A filtered image
  *
- * @author
+ * @author TODO
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+const sobel = (params) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }

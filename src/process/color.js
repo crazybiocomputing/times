@@ -228,6 +228,6 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 
 // Exports
 export {red, green, blue, alpha, luminance, chrominanceRed, chrominanceBlue, average, hue, saturation, value}; 
-export {toABGR}; 
+export {toABGR,toRGBA}; 
 export {splitChannels}; 
 

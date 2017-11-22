@@ -26,29 +26,27 @@
  * Manual thresholding
  *
  * @param {number} value - Threshold value
- * @param {TImage} img - Input gray-level image
+ * @param {TRaster} img - Input gray-level image
  * @param {boolean} copy_mode - Boolean used to control the deep copy or not of the pixels data
- * @return {TImage} - Binary output image with True = 0 (black) and False = 255 (white) pixels
+ * @return {TRaster} - Binary output image with True = 0 (black) and False = 255 (white) pixels
  *
  * @author Jean-Christophe Taveau
  */
-const threshold = (value) =>
-  (img,copy_mode = true) => {
-    let output = TImage.from(img,copy_mode);
-    output.pixelData.forEach(px =>(px > value) ? 0 : 255);
-    return output;
-   }
-}
+const threshold = (value) => (img,copy_mode = true) => {
+  let output = TRaster.from(img,copy_mode);
+  output.pixelData.forEach(px =>(px > value) ? 0 : 255);
+  return output;
+};
 
 /**
  * <Description>
  *
  * @param {type} <name> - <Description>
  * @return {type} - <Description>
- * @author
+ * @author TODO
  */
 const otsu = function (img,copy=true) {
   // TODO
   console.log(`otsu`);
-  return TImage.from(img,copy);
+  return TRaster.from(img,copy);
 }

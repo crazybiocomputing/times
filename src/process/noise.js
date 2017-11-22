@@ -26,19 +26,18 @@
  * Add Salt and Pepper Noise
  *
  * @param {number} percent - percentage of noise added to the image
- * @param {TImage} img - Input image
+ * @param {Raster} raster - Input image
  * @param {boolean} copy_mode - Used to control the copy (or not) of the image pixels
  * @usage saltAndPepper(0.05)(my_image)
  *
  * @author Jean-Christophe Taveau
  */
-const saltAndPepper = (percent=0.05) => {
-  return function (img,copy_mode = true) {
-    let output = TImage.from(img,copy_mode);
-    let pixels = output.pixelData;
-    let len = img.length;
-    let arr = Array.from({length: Math.floor(len * percent)}, x => Math.random() * len)
-      .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );      
-    return output;
-  }
+const saltAndPepper = (percent=0.05) => (raster,copy_mode = true) => {
+  let output = T.Raster.from(raster,copy_mode);
+  let pixels = output.pixelData;
+  Array.from({length: Math.floor(raster.length * percent)}, x => Math.floor(Math.random() * raster.length) )
+    .forEach( (x,i) => pixels[x] = (i%2==0) ? 255 : 0 );
+  return output;
 };
+
+export {saltAndPepper};

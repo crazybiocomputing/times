@@ -22,6 +22,8 @@
  * Jean-Christophe Taveau
  */
 
+'use script';
+
 /**
  * @module view
  */
@@ -39,8 +41,16 @@
  *
  * @author Jean-Christophe Taveau 
  */
-const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
-  console.log('TODO: view(row,column,scale)');
+const view = (raster,copy_mode=true) => {
+  // Update raster in parent (Image, Stack or Volume?))
+  raster.parent.setRaster(raster);
+  raster.parent.width = raster.width;
+  raster.parent.height = raster.height;
+  raster.parent.type = raster.type;
+  // HACK let img = new T.Image('view',raster.type,raster.width, raster.height);
+  let a_view = new T.View('view',raster.type,raster.width, raster.height);
+  a_view.appendLayer({type: 'image', data: raster.parent});
+  return a_view;
 };
 
 /**
@@ -57,11 +67,15 @@ const view = (x=0,y=0,w=-1,h=-1) => (img,copy_mode=true) => {
  * @author Jean-Christophe Taveau
  */
 const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
-  console.log('TODO: montage(row,column,scale,border)');
-  // TODO
-  let output = new T.Image('montage','uint8',stack.width, stack.height * stack.nslices);
-  output.setPixels( stack.slices.reduce( (accu,x) => [...accu,...x.pixelData], []) );
-  return output;
+  let view = new T.View('montage',stack.type,stack.width * column, stack.height * row);
+  // Create Image
+  let output = new T.Image(stack.type,stack.width * column, stack.height * row);
+  stack.slices.forEach( (sli,index) => output.raster.pad( (index % column) * stack.width, Math.floor(index/ column) * stack.height,sli) );
+  view.appendLayer({type: 'image',data: output});
+  // Create Labels
+  let labels = [{type: 'text',x:0,y:0,content: 'Test'}];
+  view.appendLayer({type: 'graphics',data: labels});
+  return view;
 };
 
 

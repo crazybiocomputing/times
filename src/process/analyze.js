@@ -23,27 +23,34 @@
  */
 
 /**
- * <Description>
+ * @module analyze
+ */
+ 
+/**
+ * Label an image as a set of Regions Of Interest (ROI)
  *
- * @params {type} <name> - <Description>
- * @return {type} - <Description>
- * @author
+ * @param {TRaster} img - Input image
+ * @param {boolean} copy - Copy mode 
+ * @return {type} A set of Regions Of Interest (ROI)
+ * @author TODO
  */
 const labelling = function (img,copy=true) {
   // TODO
   console.log(`labelling`);
-  return TImage.from(img,copy);
+  return TRaster.from(img,copy);
 }
 
 /**
- * <Description>
+ * Measure a set of Regions Of Interest (ROI)
  *
- * @params {type} <name> - <Description>
- * @return {type} - <Description>
- * @author
+ * @param {type} params - Measurements Parameters (eg. Area, Centroid)
+ * @param {type} roiset - A set of ROIs
+ * @param {boolean} copy - Useless. Just here for compatibility
+ * @return {type} Measurements and/or result image
+ * @author TODO
  */
 const measure = function (params) {
-  return function (img,copy=true) {
+  return function (roiset,copy=true) {
     // TODO
     console.log(`measure ${params}`);
     return new TMeasurements();

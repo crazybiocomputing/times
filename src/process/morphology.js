@@ -22,17 +22,18 @@
  * Jean-Christophe Taveau
  */
 
+'use script';
 
 /**
- * <Description>
+ * Description: TODO
  *
  * @param {type} <name> - <Description>
  * @return {type} - <Description>
  *
- * @author
+ * @author TODO
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+const erode = function (img,copy=true) {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }

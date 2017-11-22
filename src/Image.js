@@ -22,7 +22,8 @@
  * Jean-Christophe Taveau
  */
  
- 
+'use script';
+
 /**
  * Class for Image
  *
@@ -31,18 +32,14 @@
  
 export default class Image {
   /**
-   * Create an empty TImage.
+   * Create an empty Image.
    * 
    * @param {string} type - One of these: uint8, uint16, float32, rgba
    * @param {number} width - Image Width
    * @param {number} height - Image Height
    * @param {number} offset - Offset
    */
-  constructor(title,type,width,height, pattern="black") {
-    /**
-     * Title
-     */
-    this.title = title;
+  constructor(type,width,height, pattern="black") {
     
     /**
      * Width
@@ -70,7 +67,6 @@ export default class Image {
      */
     this.metadata = {
       dimension : 2,
-      title : title,
       type: type,
       width : width,
       height : height,
@@ -82,6 +78,7 @@ export default class Image {
      * Raster containing the pixels
      */
     this.raster = new T.Raster(type,width,height); 
+    this.raster.parent = this;
     this.fillPattern(pattern);
   }
   
@@ -107,6 +104,9 @@ export default class Image {
   /**
    * Get raster
    *
+   * @alias T.Image~getRaster
+   * @return {Raster} Returns the raster
+   *
    * @author Jean-Christophe Taveau
    */
   getRaster() {
@@ -115,6 +115,9 @@ export default class Image {
 
   /**
    * Set raster
+   *
+   * @alias T.Image~setRaster
+   * @param {Raster} a_raster - A raster image
    *
    * @author Jean-Christophe Taveau
    */
@@ -125,16 +128,14 @@ export default class Image {
   /**
    * Set pixels
    *
+   * @alias T.Image~setPixels
+   * @param {array} data - Array of pixel values (numbers)
    * @author Jean-Christophe Taveau
    */
   setPixels(data) {
     this.raster.pixelData = data;
   }
   
-  setWindow(win) {
-    this.window = win;
-  }
-
   setWindow(win) {
     this.window = win;
   }

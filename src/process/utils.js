@@ -64,9 +64,12 @@ const clampUint16 = clamp(0,65535);
  *
  * @author Eric Elliott
  */
-const pipe = (...fns) => x => fns.reduce((v, f) => f(v,false), x);
+const pipe = (...fns) => (x,copy_mode=false) => fns.reduce((v, f,i) => {
+  return f(v,copy_mode);
+  }, x);
+
 
 
 // Exports
-export {clamp,pipe};
+export {clamp,clampUint8,pipe};
 

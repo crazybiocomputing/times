@@ -22,11 +22,63 @@
  * Jean-Christophe Taveau
  */
  
-class TView {
-  constructor() {
-  
+'use script';
+
+export default class View {
+  constructor(title,type,width,height) {
+    /**
+     * Title
+     */
+    this.title = title;
+    
+    /**
+     * Width
+     */
+    this.width = width;
+    
+    /**
+     * Height
+     */
+    this.height = height;
+    
+    
+    /**
+     * Length = width * height
+     */
+    this.length = this.width * this.height;
+    
+    /**
+     * Type: uint8, uint16, uint32, float32,rgba
+     */
+    this.type = type;
+
+    /**
+     * Array of Layers
+     */
+    this.layers = [];
   }
-  render() {
+  
+  appendLayer(a_layer) {
+    this.layers.push(a_layer);
+  }
+  
+  render(win) {
     console.log('render');
+    for (let layer of this.layers) {
+      switch (layer.type) {
+      case '3D':
+        render3D(win)(layer.data);
+        break;
+      case 'graphics':
+        T.renderVector(win)(layer.data);
+        break;
+      case 'image':
+        T.render2D(win)(layer.data);
+        break;
+      case 'table':
+        T.renderTable(win)(layer.data);
+        break;
+      }
+    }
   }
 }

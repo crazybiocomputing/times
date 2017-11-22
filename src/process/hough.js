@@ -22,17 +22,39 @@
  * Jean-Christophe Taveau
  */
 
+/**
+ * @module hough
+ */
+ 
+ 
+/**
+ * Linear Hough Transform
+ *
+ * @param {type} params - Parameters
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Image corresponding to the accumulator
+ *
+ * @author TODO
+ */
+const houghLinear = (params) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
+  // TODO
+  return output;
+}
 
 /**
- * <Description>
+ * Circular Hough Transform
  *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
+ * @param {type} params - Parameters
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Image corresponding to the accumulator
  *
- * @author
+ * @author TODO
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+const houghCircle = (params) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }

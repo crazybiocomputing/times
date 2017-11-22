@@ -38,7 +38,7 @@ export default class Raster {
    * @param {number} height - Image Height
    * @param {number} offset - Offset
    */
-  constructor(type,width,height,label='None') {
+  constructor(type,width,height,depth=1) {
     /**
      * Width
      */
@@ -50,14 +50,19 @@ export default class Raster {
     this.height = height;
     
     /**
+     * Depth Only for 3D data
+     */
+    this.depth = depth;
+    
+    /**
      * Label
      */
-    this.label = label;
+    this.label = 'None';
     
     /**
      * Length = width * height
      */
-    this.length = this.width * this.height;
+    this.length = this.width * this.height * this.depth;
     
     /**
      * Type: uint8, uint16, uint32, float32,rgba
@@ -68,6 +73,11 @@ export default class Raster {
      * Pixels array
      */
     this.pixelData; 
+    
+    /**
+     * Image, Stack or Volume parent
+     */
+    this.parent; 
   }
   
   /*
@@ -107,6 +117,7 @@ export default class Raster {
    */
   static from(other, copy = true) {
     let img = new T.Raster(other.type,other.width, other.height);
+    img.parent = other.parent;
     img.pixelData = (copy === true) ? [...other.pixelData] : other.pixelData; // Copy pixels
     return img;
   }
@@ -192,7 +203,7 @@ export default class Raster {
    * @author: Jean-Christophe Taveau
    */
   x(index) {
-    return x % this.width;
+    return index % this.width;
   }
   
   /**
@@ -205,7 +216,7 @@ export default class Raster {
    * @author: Jean-Christophe Taveau
    */
   y(index) {
-    return Math.floor(x / this.width);
+    return Math.floor(index / this.width);
   }
   
   /**
@@ -217,4 +228,15 @@ export default class Raster {
     this.pixelData[index] = value;
   }
 
+  /**
+   * Pad a smaller raster within this raster
+   *
+   * @author Jean-Christophe Taveau
+   */
+  pad(topleft_x,topleft_y,small_img) {
+    for (let y = 0; y < small_img.height; y++) {
+      let chunk = small_img.pixelData.slice(y * small_img.width, (y+1) * small_img.width);
+      chunk.forEach ( (px, index) => this.pixelData[topleft_x + index + (topleft_y + y)* this.width] = px, this);
+    }
+  }
 }

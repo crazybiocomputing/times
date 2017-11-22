@@ -22,12 +22,68 @@
  * Jean-Christophe Taveau
  */
 
+'use script';
 
-class TVolume {
+/**
+ * Class for Volume
+ *
+ * @alias T.Volume
+ */
+ 
+export default class Volume {
   /**
-   * @constructor
+   * Create an empty Volume
+   *
+   * @param {string} type - Pixel type number: uint8, uint16, float32, rgba
+   * @param {number} width - Width
+   * @param {number} height - Height
+   * @param {number} depth - Depth
    */
-  constructor() {
-  
+  constructor(type,width,height,depth,pattern="black") {
+    
+    /**
+     * Width
+     */
+    this.width = width;
+    
+    /**
+     * Height
+     */
+    this.height = height;
+    
+    /**
+     * Depth
+     */
+    this.depth = depth;
+    
+    /**
+     * Length = width * height * depth
+     */
+    this.length = this.width * this.height * this.depth;
+    
+    /**
+     * Type: uint8, uint16, uint32, float32,rgba
+     */
+    this.type = type;
+
+    /**
+     * Metadata containing annotations, information,etc.
+     */
+    this.metadata = {
+      dimension : 3,
+      type: type,
+      width : width,
+      height : height,
+      depth : 1,
+      fill : pattern
+    };
+    
+    /**
+     * Raster containing the pixels
+     */
+    this.raster = new T.Raster(type,width,height,depth); 
+    this.raster.parent = this;
+    this.raster.pixelData = T.Raster.createPixels(this.type,this.length);
   }
+  
 }

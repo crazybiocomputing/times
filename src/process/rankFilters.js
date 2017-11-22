@@ -24,15 +24,21 @@
 
 
 /**
- * <Description>
- *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
- *
- * @author
+ * @module rankFilters
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+ 
+/**
+ * Minimum filter
+ *
+ * @param {TRaster} kernel - Convolution mask
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Filtered Image
+ *
+ * @author TODO
+ */
+const minimum = (kernel) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }

@@ -24,15 +24,24 @@
 
 
 /**
- * <Description>
- *
- * @param {type} <name> - <Description>
- * @return {type} - <Description>
- *
- * @author
+ * @module type
  */
-const my_function = function (img,copy=true) {
-  let ouput =  TImage.from(img,copy);
+ 
+/**
+ * Convert a RGBA to a uint8 image
+ *
+ * @example <caption>Conversion of a color image to a luminance gray image.</caption>
+ * let gray8_img = toUint8(luminance)(img);
+ *
+ * @param {function} func - A converter function
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @returns {TRaster} - Uint8 Image (aka 8-bit image)
+ *
+ * @author TODO
+ */
+const toUint8 = (func) => (img,copy=true) => {
+  let ouput =  TRaster.from(img,copy);
   // TODO
   return output;
 }
