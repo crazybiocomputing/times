@@ -1,2 +1,2 @@
 # times
-Tiny Image in ECMAScript
+Tiny Image Processing in ECMAScript
