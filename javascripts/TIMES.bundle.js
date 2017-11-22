@@ -70,7 +70,8 @@ var T =
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return clamp; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return pipe; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return clampUint8; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return pipe; });
 /*
  *  times: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -157,47 +158,56 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Raster__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Image__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Stack__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Window__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__View__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__process_utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_color__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__process_geometry__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_math__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_noise__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__render_view__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__render_render2D__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__render_renderVector__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Volume__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Window__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__View__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_utils__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__process_color__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_geometry__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_math__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__process_noise__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__render_view__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__render_render2D__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__render_renderVector__ = __webpack_require__(14);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Raster", function() { return __WEBPACK_IMPORTED_MODULE_0__Raster__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return __WEBPACK_IMPORTED_MODULE_1__Image__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Stack", function() { return __WEBPACK_IMPORTED_MODULE_2__Stack__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Window", function() { return __WEBPACK_IMPORTED_MODULE_3__Window__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "View", function() { return __WEBPACK_IMPORTED_MODULE_4__View__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_5__process_utils__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_5__process_utils__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "alpha", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceRed", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["m"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["j"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toABGR", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["k"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_6__process_color__["l"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_7__process_geometry__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_8__process_math__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_9__process_noise__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_12__render_renderVector__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Volume", function() { return __WEBPACK_IMPORTED_MODULE_3__Volume__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Window", function() { return __WEBPACK_IMPORTED_MODULE_4__Window__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "View", function() { return __WEBPACK_IMPORTED_MODULE_5__View__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_6__process_utils__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clampUint8", function() { return __WEBPACK_IMPORTED_MODULE_6__process_utils__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_6__process_utils__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "alpha", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceRed", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["m"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toABGR", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["k"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_7__process_color__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_8__process_geometry__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "black", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chessboard", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "math", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "spiral", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "white", function() { return __WEBPACK_IMPORTED_MODULE_9__process_math__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_10__process_noise__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_11__render_view__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_11__render_view__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_13__render_renderVector__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -222,6 +232,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  * Jean-Christophe Taveau
  */
  
+
 
 
 
@@ -301,7 +312,7 @@ class Raster {
    * @param {number} height - Image Height
    * @param {number} offset - Offset
    */
-  constructor(type,width,height,label='None') {
+  constructor(type,width,height,depth=1) {
     /**
      * Width
      */
@@ -313,14 +324,19 @@ class Raster {
     this.height = height;
     
     /**
+     * Depth Only for 3D data
+     */
+    this.depth = depth;
+    
+    /**
      * Label
      */
-    this.label = label;
+    this.label = 'None';
     
     /**
      * Length = width * height
      */
-    this.length = this.width * this.height;
+    this.length = this.width * this.height * this.depth;
     
     /**
      * Type: uint8, uint16, uint32, float32,rgba
@@ -461,7 +477,7 @@ class Raster {
    * @author: Jean-Christophe Taveau
    */
   x(index) {
-    return x % this.width;
+    return index % this.width;
   }
   
   /**
@@ -474,7 +490,7 @@ class Raster {
    * @author: Jean-Christophe Taveau
    */
   y(index) {
-    return Math.floor(x / this.width);
+    return Math.floor(index / this.width);
   }
   
   /**
@@ -531,7 +547,8 @@ class Raster {
  * Jean-Christophe Taveau
  */
  
- 
+'use script';
+
 /**
  * Class for Image
  *
@@ -701,11 +718,7 @@ class Stack {
    * @param {number} height - Height
    * @param {number} nslices - Slice number in the stack
    */
-  constructor(title,type,width,height,nslices,pattern="black") {
-    /**
-     * Title
-     */
-    this.title = title;
+  constructor(type,width,height,nslices,pattern="black") {
     
     /**
      * Width
@@ -808,6 +821,104 @@ class Stack {
 
 /***/ }),
 /* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+'use script';
+
+/**
+ * Class for Volume
+ *
+ * @alias T.Volume
+ */
+ 
+class Volume {
+  /**
+   * Create an empty Volume
+   *
+   * @param {string} type - Pixel type number: uint8, uint16, float32, rgba
+   * @param {number} width - Width
+   * @param {number} height - Height
+   * @param {number} depth - Depth
+   */
+  constructor(type,width,height,depth,pattern="black") {
+    
+    /**
+     * Width
+     */
+    this.width = width;
+    
+    /**
+     * Height
+     */
+    this.height = height;
+    
+    /**
+     * Depth
+     */
+    this.depth = depth;
+    
+    /**
+     * Length = width * height * depth
+     */
+    this.length = this.width * this.height * this.depth;
+    
+    /**
+     * Type: uint8, uint16, uint32, float32,rgba
+     */
+    this.type = type;
+
+    /**
+     * Metadata containing annotations, information,etc.
+     */
+    this.metadata = {
+      dimension : 3,
+      type: type,
+      width : width,
+      height : height,
+      depth : 1,
+      fill : pattern
+    };
+    
+    /**
+     * Raster containing the pixels
+     */
+    this.raster = new T.Raster(type,width,height,depth); 
+    this.raster.parent = this;
+    this.raster.pixelData = T.Raster.createPixels(this.type,this.length);
+  }
+  
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Volume;
+
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -955,7 +1066,7 @@ class Window {
         let y = Math.floor(evt.clientY - rect.top);
         let pixels = canvas.layerData.raster.pixelData;
         let w = canvas.layerData.raster.width;
-        let pix = pixels[x + y * w];
+        let pix = pixels[x + y * w] >>>0;
         let message = `(${x},${y}): ${pix}`;
         if (the_view.layers[0].data.raster.type === 'rgba') {
           message = `(${x},${y}): #${pix.toString(16)} (${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
@@ -1014,7 +1125,7 @@ class Window {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1107,7 +1218,7 @@ class View {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1362,13 +1473,11 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return crop; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return fillColor; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return fill; });
 /*
  *  times: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -1423,74 +1532,6 @@ const crop = (top_left_x, top_left_y,new_width,new_height) => (raster,copy_mode=
   return output;
 }
   
-/**
-  * Fill with the pixel gray or color value depending of the raster type
-  * @param {number} value - A gray or color value
-  * @param {Raster} raster - Input Raster
-  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
-  *
-  * @author Jean-Christophe Taveau
-  */
-const fillColor = (value) => (raster,copy_mode=true) => {
-  raster.pixelData.fill(value);
-  return raster;
-}
-  
-/**
-  * Fill raster with specific patterns
-  *
-  * @param {string} keyword - Pattern among: black, white, ramp, chessboard, noise
-  * @param {Raster} raster - Input Raster
-  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
-  *
-  * @author Jean-Christophe Taveau
-  */
-const fillPattern = (keyword) => (raster,copy_mode=true) => {
-  // TODO
-}
-  
-/**
-  * Fill with values calculated from a function
-  *
-  * @param {function} func - A function
-  * <p>The function may take a maximum of nine arguments:</p>
-  * <ul>
-  * <li>pix - Pixel value</li>
-  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
-  * <li>x - X-coordinate of pix</li>
-  * <li>y - Y-coordinate of pix</li>
-  * <li>z - Z-coordinate of pix if raster is in 3D</li>
-  * <li>w - Width of raster</li>
-  * <li>h - Height of raster</li>
-  * <li>a - Angle calculated as atan2(y/x)</li>
-  * <li>d - Distance to the center</li>
-  * </ul>
-  * @example <caption>Fill with a spiral</caption>
-  * const DEG = Math.PI / 180;
-  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
-  * let raster = T.fill(spiral)(img.getRaster() );
-  * @param {Raster} raster - Input Raster
-  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
-  *
-  * @author Jean-Christophe Taveau
-  */
-const fill = (func) => (raster,copy_mode=true) => {
-  let w = raster.width;
-  let h = raster.height;
-  let cx = h / 2.0;
-  let cy = h / 2.0;
-  
-  raster.pixelData.forEach ( (px,i,arr) => {
-    let x = i % w;
-    let y = Math.floor(i / w);
-    let z = Math.floor( i / w / h);
-    let d = Math.sqrt ((x-cx)**2 + (y -cy)**2);
-    let a = Math.atan2(y,x);
-    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
-  });
-  return raster;
-};
-  
 
 /**
   * Flip vertically
@@ -1537,11 +1578,19 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return calc; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return black; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return calc; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return chessboard; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return fill; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return fillColor; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return math; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return ramp; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return spiral; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return white; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -1570,6 +1619,71 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
  * @module math
  */
  
+
+/**
+  * Fill with the pixel gray or color value depending of the raster type
+  * @param {number} value - A gray or color value
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const fillColor = (value) => (raster,copy_mode=true) => {
+  raster.pixelData.fill(value);
+  return raster;
+}
+
+/**
+  * Pattern `chessboard`. Must be used with T.fill(..)
+  *
+  * @example
+  * let output = T.fill(T.chessboard)(raster)
+  *
+  * @author Jean-Christophe Taveau
+  */
+const chessboard = (px,i,x,y) => ( (Math.floor(x/16) + Math.floor(y/16)) % 2 === 0) ? 255 : 0;
+
+/**
+  * Pattern `ramp`. Must be used with T.fill(..)
+  *
+  * @example
+  * let output = T.fill(T.ramp)(raster)
+  *
+  * @author Jean-Christophe Taveau
+  */
+const ramp = (px,i,x,y,z,w,h) => x / w * 255;
+
+/**
+  * Pattern `spiral`. Must be used with T.fill(..)
+  *
+  * @example
+  * let output = T.fill(T.spiral)(raster)
+  *
+  * @author Jean-Christophe Taveau
+  */
+const spiral = (px,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10 + a * DEG)+1);
+
+/**
+  * Pattern `black`. Must be used with T.fill(..)
+  *
+  * @example
+  * let output = T.fill(T.black)(raster)
+  *
+  * @author Jean-Christophe Taveau
+  */
+const black = (px) => 0;
+
+/**
+  * Pattern `white`. Must be used with T.fill(..)
+  *
+  * @example
+  * let output = T.fill(T.white)(raster)
+  *
+  * @author Jean-Christophe Taveau
+  */
+const white = (px) => 255;
+
+  
 /**
   * Fill with values calculated from a function
   *
@@ -1595,47 +1709,85 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
   *
   * @author Jean-Christophe Taveau
   */
-const calc = (func) => (raster,copy_mode=true) => {
-  let output = T.Raster.from(raster,copy_mode);
-  let w = output.width;
-  let h = output.height;
-  let cx = h / 2.0;
+const fill = (func) => (raster,copy_mode=true) => {
+  let w = raster.width;
+  let h = raster.height;
+  let nz = raster.depth || raster.nslices || 0;
+  let cx = w / 2.0;
   let cy = h / 2.0;
+  let cz = nz / 2.0;
   
-  output.pixelData.forEach ( (px,i,arr) => {
+  raster.pixelData.forEach ( (px,i,arr) => {
     let x = i % w;
     let y = Math.floor(i / w);
     let z = Math.floor( i / w / h);
-    let d = Math.sqrt ((x-cx)**2 + (y -cy)**2);
+    let d = Math.sqrt ((x - cx)**2 + (y - cy)**2 + (z - cz)**2);
     let a = Math.atan2(y,x);
-    output.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+  });
+  return raster;
+};
+  
+
+/**
+  * Fill with values calculated from a function
+  *
+  * @param {function} func - A function
+  * <p>The function may take a maximum of nine arguments:</p>
+  * <ul>
+  * <li>pix - Pixel value</li>
+  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+  * <li>x - X-coordinate of pix</li>
+  * <li>y - Y-coordinate of pix</li>
+  * <li>z - Z-coordinate of pix if raster is in 3D</li>
+  * <li>w - Width of raster</li>
+  * <li>h - Height of raster</li>
+  * <li>a - Angle calculated as atan2(y/x)</li>
+  * <li>d - Distance to the center</li>
+  * </ul>
+  * @example <caption>Fill with a spiral</caption>
+  * const DEG = Math.PI / 180;
+  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+  * let raster = T.fill(spiral)(img.getRaster() );
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const math = (func) => (raster,copy_mode=true) => T.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
+
+/**
+ * Image Calculator. Combine two images by operation
+ *
+ * @param {Raster} raster - Input Raster
+ * @param {function} func - Function for computation
+ * @param {Raster} raster - Input Raster
+ * @param {boolean} copy_mode - Copy mode to manage memory usage.
+ * @example <caption>Addition of two uint8 rasters with clamping</caption>
+ * let raster3 = T.calc(raster1, (px1,px2) => T.clampUint8(px1 + px2) )(raster2)
+ *
+ * @author Jean-Christophe Taveau
+ */
+const calc = (other,func) => (raster,copy_mode=true) => {
+  // TODO Assume two raster have same dimension
+  let output = T.Raster.from(raster, copy_mode);
+  output.pixelData.forEach( (px2,i,arr) => {
+    let w = raster.width;
+    let x = i % w;
+    let y = Math.floor(i / w);
+    let px1 = other.pixelData[i];
+    output.pixelData[i] = func(px1,px2,i,x,y);
   });
   return output;
 };
 
-/**
- * Add a constant value to all the raster pixels
- * 
- * @param {number} v - Constant value
- * @param {Raster} img - Input image
- * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
- * @return {object} - Returns an object containing min, max, mean, variance
- *
- * @author Jean-Christophe Taveau
- */
-const addK = (v) => (img, copy_mode = true) => {
-  let output = T.Raster.from(img,copy_mode);
-  output.pixelData.forEach( (px) => px + v);
-};
-
-
-// EXport
+// Export
 
 
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1686,7 +1838,7 @@ const saltAndPepper = (percent=0.05) => (raster,copy_mode = true) => {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1778,7 +1930,7 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1881,7 +2033,7 @@ const render2D = (win) => (img,copy=true) => {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
