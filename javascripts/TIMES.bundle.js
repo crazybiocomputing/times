@@ -496,10 +496,24 @@ class Raster {
   /**
    * Set pixel value at given index
    *
+   * @param {number} index - Pixel index
+   * @param {number} value - Pixel value
    * @author Jean-Christophe Taveau
    */
   set(index,value) {
     this.pixelData[index] = value;
+  }
+
+  /**
+   * Set pixel value at given X,Y-coordinates
+   *
+   * @param {number} x - Pixel X-coordinate
+   * @param {number} y - Pixel Y-coordinate
+   * @param {number} value - Pixel value
+   * @author Jean-Christophe Taveau
+   */
+  setPixel(x,y,value) {
+    this.pixelData[x + y * this.width] = value;
   }
 
   /**
