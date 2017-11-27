@@ -1173,7 +1173,7 @@ class Window {
         let pix = (the_view.layers[0].data.raster.type === 'float32') ? pixels[x + y * w] : pixels[x + y * w] >>>0;
         let message = `(${x},${y}): ${pix}`;
         if (the_view.layers[0].data.raster.type === 'rgba' || the_view.layers[0].data.raster.type === 'abgr') {
-          message = `(${x},${y}): #${pix.toString(16)} (${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
+          message = `(${x},${y}): rgba(${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
         }
         let info = canvas.parentNode.nextSibling;
         info.innerHTML = message;
