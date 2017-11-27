@@ -40,4 +40,37 @@ const saltAndPepper = (percent=0.05) => (raster,copy_mode = true) => {
   return output;
 };
 
-export {saltAndPepper};
+
+/** 
+ * Adds pseudorandom, Gaussian ("normally") distributed values, with
+ * mean 0.0 and the specified standard deviation, to this image or ROI. 
+ * Adapted from ImageJ code (Wayne Rasband)
+ */
+const noise = (standardDeviation = 25.0) => (raster,copy_mode = true) => {
+  // Private functions
+  const inRange = (x,a_min,a_max) => (x >= a_min && x <= a_max);
+  
+  // Standard Normal variate using Box-Muller transform.
+  const rand_bm = (variance) => {
+    let u = 0, v = 0;
+    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
+    while(v === 0) v = Math.random();
+    return Math.sqrt( -2.0 * Math.log( u ) * variance) * Math.cos( 2.0 * Math.PI * v );
+  };
+
+  let dummy = T.statistics(raster);
+  let output = T.Raster.from(raster,copy_mode);
+  let pixels = output.pixelData;
+  let variance = standardDeviation**2;
+  raster.pixelData.forEach( (px,i) => {
+    do {
+      pixels[i] = Math.floor(px + rand_bm(variance));
+    } while (!inRange(pixels[i],0,255))
+  } );
+  return output;
+};
+
+
+
+    
+export {noise,saltAndPepper};

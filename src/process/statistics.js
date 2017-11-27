@@ -61,11 +61,21 @@ const statistics = (img, copy_mode = true) => {
   return img;
 };
 
-const histogram = (binNumber) => (img, copy_mode = true) => {
-  // TODO
+const histogram = (binNumber) => (raster, copy_mode = true) => {
+  // Update statistics
+  let stats = T.statistics(raster);
+  let delta = (raster.statistics.max - raster.statistics.min);
+  raster.statistics.histogram = raster.pixelData.reduce ((bins,px,i) => {
+    let index = T.clamp(0,binNumber)( Math.floor( (binNumber - 1) * (px - raster.statistics.min)/ delta));
+    bins[index]++;
+    return bins;
+    },
+    new Array(binNumber).fill(0)
+  );
+  return raster;
 };
 
 // Exports
-export {statistics};
+export {histogram,statistics};
 
 

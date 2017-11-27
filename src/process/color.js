@@ -24,7 +24,7 @@
  
 'use script';
 
-import {clamp} from './utils';
+import {clamp,isLittleEndian} from './utils';
 
 /**
  * @module color
@@ -39,71 +39,71 @@ import {clamp} from './utils';
 const clampUint8 = clamp(0,255);
  
 /**
- * Compute RGBA pixel value from gray uint8 value 
+ * Compute color pixel value from gray uint8 value 
  * @param {number} gray8 - uint8 gray value 
- * @return {number} RGBA Pixel value 
+ * @return {number} color Pixel value 
  */
-const fromGray8 = (gray8) => gray8 << 24 | gray8 << 16 | gray8 << 8 | 0xff;
+const fromGray8 = (gray8) => isLittleEndian() ? 0xff000000 | gray8 << 16 | gray8 << 8 | gray8 & 0xff : gray8 << 24 | gray8 << 16 | gray8 << 8 | 0xff;
 
 /**
- * Convert RGBA pixel value to an array with red, green, blue, and alpha uint8 values
- * @param {number} rgba - RGBA Pixel value 
+ * Convert color pixel value to an array with red, green, blue, and alpha uint8 values
+ * @param {number} color - color Pixel value 
  * @return {array} An array of red, green, blue, and alpha uint8 components
  */
-const fromRGBA = (rgba) => [(rgba >> 24) & 0xff, (rgba >> 16) & 0xff, (rgba >> 8) & 0xff, rgba & 0xff];
+const fromcolor = (color) => [(color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff];
 
-const toRGBA = (r,g,b,a) => ( r << 24) | (g << 16) | (b << 8) | a;
+const tocolor = (r,g,b,a) => ( r << 24) | (g << 16) | (b << 8) | a;
 
 // TODO
 const fromABGR = (abgr) => ( abgr << 24) | (abgr << 16) | (abgr << 8) | abgr;
 
 /**
- * Compute ABGR pixel value from four uint8 red, green, blue, and alpha components 
+ * Compute RGBA pixel value from four uint8 red, green, blue, and alpha components 
  * @param {number} red - uint8 red component 
  * @param {number} green - uint8 green component 
  * @param {number} blue - uint8 blue component 
  * @param {number} alpha - uint8 alpha component 
  * @return {number} ABGR Pixel value 
  */
-const toABGR = (r,g,b,a) => ( a << 24) | (b << 16) | (g << 8) | r;
+const toRGBA = (r,g,b,a) => (isLittleEndian() ? (( a << 24) | (b << 16) | (g << 8) | r) : (( r << 24) | (g << 16) | b << 8) | a);
 
 // TODO
-const toabgr = (rgba) => ( (rgba & 0xff) << 24) | ( (rgba & 0x00ff00) << 8) | ( (rgba & 0xff0000) >> 8) | ( (rgba & 0xff000000) >> 24);
+const toabgr = (color) => ( (color & 0xff) << 24) | ( (color & 0x00ff00) << 8) | ( (color & 0xff0000) >> 8) | ( (color & 0xff000000) >> 24);
 
 /**
- * Extract red component of RGBA pixel value
- * @param {number} rgba - RGBA Pixel value 
+ * Extract red component of color pixel value
+ * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const red = (rgba) => rgba >> 24 & 0xff;
+const alpha = (color) => isLittleEndian() ? color >> 24 & 0xff : color & 0xff;
 
 /**
- * Extract green component of RGBA pixel value
- * @param {number} rgba - RGBA Pixel value 
+ * Extract green component of color pixel value
+ * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const green = (rgba) => rgba >> 16 & 0xff;
+const blue = (color) => isLittleEndian() ? color >> 16 & 0xff : color >> 8 & 0xff;
 
 /**
- * Extract blue component of RGBA pixel value
- * @param {number} rgba - RGBA Pixel value 
+ * Extract blue component of color pixel value
+ * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const blue = (rgba) => rgba >> 8 & 0xff;
+const green = (color) => isLittleEndian() ? color >> 8 & 0xff : color >> 16 & 0xff;
 
 /**
- * Extract alpha (transparency) component of RGBA pixel value
- * @param {number} rgba - RGBA Pixel value 
+ * Extract alpha (transparency) component of color pixel value
+ * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const alpha = (rgba) => rgba & 0xff;
+const red = (color) => isLittleEndian() ? color & 0xff : color >> 24 & 0xff;
 
 /**
- * Compute Luminance gray value from RGBA pixel value
- * @param {number} rgba - RGBA Pixel value 
+ * Compute Luminance gray value from color pixel value
+ * @param {number} color - color Pixel value 
  * @return {number} Luminance uint8 value 
  */
-const luminance = (rgba) => {
+const luminance = (color) => {
   /*
   Franci Penov and Glenn Slayden
   From https://stackoverflow.com/questions/596216/formula-to-determine-brightness-of-rgb-color
@@ -115,42 +115,42 @@ const luminance = (rgba) => {
   Fast: Y = (R+R+R+B+G+G+G+G)>>3
   */
   
-  let r = red(rgba);
-  let g = green(rgba);
-  let b = blue(rgba);
+  let r = red(color);
+  let g = green(color);
+  let b = blue(color);
   return (r+r+r+b+g+g+g+g)>>3; 
 };
 
 /**
- * Extract chrominance red component of RGBA pixel value according to the YUV colorspace
- * @param {number} rgba - RGBA Pixel value 
+ * Extract chrominance red component of color pixel value according to the YUV colorspace
+ * @param {number} color - Color Pixel value 
  * @return {number} - uint8 value 
  */
-const chrominanceRed = (rgba) => -0.168736 * red(rgba) - 0.331264 * green(rgba) + 0.500000 * blue(rgba) + 128;
+const chrominanceRed = (color) => -0.168736 * red(color) - 0.331264 * green(color) + 0.500000 * blue(color) + 128;
 
 /**
- * Extract chrominance blue component of RGBA pixel value according to the YUV colorspace
- * @param {number} rgba - RGBA Pixel value 
+ * Extract chrominance blue component of color pixel value according to the YUV colorspace
+ * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const chrominanceBlue = (rgba) => 0.500000 * red(rgba) - 0.418688 * green(rgba) - 0.081312 * blue(rgba) + 128;
+const chrominanceBlue = (color) => 0.500000 * red(color) - 0.418688 * green(color) - 0.081312 * blue(color) + 128;
 
 /**
- * Convert RGBA pixel value to Average gray value
- * @param {number} rgba - RGBA Pixel value 
+ * Convert color pixel value to Average gray value
+ * @param {number} color - color Pixel value 
  * @return {number} uint8 value
  */
-const average = (rgba) => Math.floor(red(rgba) + green(rgba) + blue(rgba) / 3.0);
+const average = (color) => Math.floor(red(color) + green(color) + blue(color) / 3.0);
 
 /**
- * Extract hue component of RGBA pixel value according to HSV colorspace
- * @param {number} rgba - RGBA Pixel value 
+ * Extract hue component of color pixel value according to HSV colorspace
+ * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const hue = (rgba) => {
+const hue = (color) => {
   const ratio = (a,b,delta) => (a-b)/delta;
   
-  let r = T.red(rgba) / 255.0, g = T.green(rgba) / 255.0, b = T.blue(rgba) / 255.0;
+  let r = T.red(color) / 255.0, g = T.green(color) / 255.0, b = T.blue(color) / 255.0;
   let maxi = Math.max(r,Math.max(g,b));
   let mini = Math.min(r,Math.min(g,b));
   let delta = maxi - mini;
@@ -160,8 +160,8 @@ const hue = (rgba) => {
   return clampUint8(Math.floor(out / 360.0 * 255));
 };
 
-const hue2 = (rgba) => {
-  let r = T.red(rgba), g = T.green(rgba), b = T.blue(rgba);
+const hue2 = (color) => {
+  let r = T.red(color), g = T.green(color), b = T.blue(color);
   let maxi = Math.max(r,Math.max(g,b));
   let mini = Math.min(r,Math.min(g,b));
 
@@ -181,23 +181,23 @@ const hue2 = (rgba) => {
 }
 
 /**
- * Extract saturation component of RGBA pixel value  according to HSV colorspace
- * @param {number} rgba - RGBA Pixel value 
+ * Extract saturation component of color pixel value  according to HSV colorspace
+ * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const saturation = (rgba) => {
-  let r = T.red(rgba), b = T.blue(rgba), g = T.green(rgba);
+const saturation = (color) => {
+  let r = T.red(color), b = T.blue(color), g = T.green(color);
   let maxi = Math.max(r,Math.max(g,b));
   let mini = Math.min(r,Math.min(g,b));
   return (maxi === 0) ? 0 : (1.0 - mini/maxi) * 255;
 };
 
 /**
- * Extract `value` component of RGBA pixel value according to HSV colorspace
- * @param {number} rgba - RGBA Pixel value 
+ * Extract `value` component of color pixel value according to HSV colorspace
+ * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const value = (rgba) => Math.max(T.red(rgba),Math.max(T.green(rgba), T.blue(rgba)));
+const value = (color) => Math.max(T.red(color),Math.max(T.green(color), T.blue(color)));
 
 
 /**
@@ -210,7 +210,7 @@ const value = (rgba) => Math.max(T.red(rgba),Math.max(T.green(rgba), T.blue(rgba
  * <li> cyan(px),magenta(px),yellow(px),</li>
  * <li> luminance(px), chrominance(px)</li>
  * </ul>
- * @param {Raster} color_img - A RGBA color image
+ * @param {Raster} color_img - A color image
  * @param {boolean} copy - Useless here, only for compatibility with the other process functions
  * @return {Stack} Return a stack containing the channels of various colorspaces
  * @see color.js
@@ -228,6 +228,6 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 
 // Exports
 export {red, green, blue, alpha, luminance, chrominanceRed, chrominanceBlue, average, hue, saturation, value}; 
-export {toABGR,toRGBA}; 
+export {toRGBA,tocolor}; 
 export {splitChannels}; 
 

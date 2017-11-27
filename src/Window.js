@@ -142,9 +142,9 @@ export default class Window {
         let y = Math.floor(evt.clientY - rect.top);
         let pixels = canvas.layerData.raster.pixelData;
         let w = canvas.layerData.raster.width;
-        let pix = pixels[x + y * w] >>>0;
+        let pix = (the_view.layers[0].data.raster.type === 'float32') ? pixels[x + y * w] : pixels[x + y * w] >>>0;
         let message = `(${x},${y}): ${pix}`;
-        if (the_view.layers[0].data.raster.type === 'rgba') {
+        if (the_view.layers[0].data.raster.type === 'rgba' || the_view.layers[0].data.raster.type === 'abgr') {
           message = `(${x},${y}): #${pix.toString(16)} (${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
         }
         let info = canvas.parentNode.nextSibling;

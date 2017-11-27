@@ -89,11 +89,12 @@ export default class Raster {
   static createPixels(type,length) {
     let arr;
     switch (type) {
-    case 'uint8': arr = new Uint8ClampedArray(length).fill(0);
-    case 'uint16': arr = new Uint16Array(length).fill(0);
-    case 'uint32': arr = new Uint32Array(length).fill(0);
-    case 'float32': arr = new Float32Array(length).fill(0.0);
-    case 'rgba': arr = new Uint32Array(length).fill(0);
+    case 'uint8': arr = new Uint8ClampedArray(length).fill(0); break;
+    case 'uint16': arr = new Uint16Array(length).fill(0);break;
+    case 'uint32': arr = new Uint32Array(length).fill(0);break;
+    case 'float32': arr = new Float32Array(length).fill(0.0);break;
+    case 'abgr':
+    case 'rgba': arr = new Uint32Array(length).fill(0);break;
     }
     return arr;
   }
@@ -222,10 +223,24 @@ export default class Raster {
   /**
    * Set pixel value at given index
    *
+   * @param {number} index - Pixel index
+   * @param {number} value - Pixel value
    * @author Jean-Christophe Taveau
    */
   set(index,value) {
     this.pixelData[index] = value;
+  }
+
+  /**
+   * Set pixel value at given X,Y-coordinates
+   *
+   * @param {number} x - Pixel X-coordinate
+   * @param {number} y - Pixel Y-coordinate
+   * @param {number} value - Pixel value
+   * @author Jean-Christophe Taveau
+   */
+  setPixel(x,y,value) {
+    this.pixelData[x + y * this.width] = value;
   }
 
   /**

@@ -23,6 +23,9 @@
  */
  
 
+
+import {TIMES} from './TIMES';
+
 import Raster from './Raster';
 import Image from './Image';
 import Stack from './Stack';
@@ -30,11 +33,14 @@ import Volume from './Volume';
 import Window from './Window';
 import View from './View';
 
+/* io/loadImage */
+import {loadImage} from './io/loadImage';
+
 /* Process/utils */
 import {clamp,clampUint8,pipe} from './process/utils';
 
 /* Process/color */
-import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toABGR,toRGBA} from './process/color';
+import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toRGBA} from './process/color';
 
 /* Process/geometry */
 import {crop} from './process/geometry';
@@ -43,25 +49,34 @@ import {crop} from './process/geometry';
 import {black,calc,chessboard,fillColor,fill,math,ramp,spiral,white} from './process/math';
 
 /* Process/noise */
-import {saltAndPepper} from './process/noise';
+import {noise,saltAndPepper} from './process/noise';
+
+//* Process/statistics */
+import {histogram,statistics} from './process/statistics';
+
+//* Process/type */
+import {fromABGRtoUint8} from './process/type';
 
 /* Render/view */
 import {montage,view} from './render/view';
 
 /* Render */
-import {renderUint8,renderRGBA,render2D} from './render/render2D';
+import {renderUint8,renderUint16,renderFloat32,renderABGR,renderRGBA,render2D} from './render/render2D';
 import {renderVector} from './render/renderVector';
 
 export {
   Raster,Image,Stack,Volume,Window,View,
+  loadImage,
   clamp,clampUint8,pipe,
   red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
-  splitChannels,toABGR,toRGBA,
+  splitChannels,toRGBA,
   crop,
   black,calc,chessboard,fillColor,fill,math,ramp,spiral,white,
-  saltAndPepper,
+  noise,saltAndPepper,
+  histogram,statistics,
+  fromABGRtoUint8,
   montage,view,
-  renderUint8,renderRGBA,render2D,
+  renderUint8,renderUint16,renderFloat32,renderABGR,renderRGBA,render2D,
   renderVector
 };
 

@@ -58,7 +58,7 @@ export default class Image {
     this.length = this.width * this.height;
     
     /**
-     * Type: uint8, uint16, uint32, float32,rgba
+     * Type: uint8, uint16, uint32, float32,abgr, rgba
      */
     this.type = type;
 

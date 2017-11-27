@@ -10,6 +10,35 @@ win0.addView(view0);
 // Add the window to the DOM and display it
 win0.addToDOM('workspace');
 
+/**
+ * Display uint16 images
+ */
+let img01 = new T.Image('uint16',256,254);
+let uint16_blobs = blobs_pixels.map ( (px) => px * 256);
+img01.setPixels(uint16_blobs);
+let win01 = new T.Window('Blobs uint16');
+let view01 = T.view(img01.getRaster());
+// Create the window content from the view
+win01.addView(view01);
+// Add the window to the DOM and display it
+win01.addToDOM('workspace');
+
+/**
+ * Display float32 images
+ */
+let img02 = new T.Image('float32',256,254);
+let float_blobs = blobs_pixels.map( (px) => px/128 - 1.0);
+img02.setPixels(float_blobs);
+let win02 = new T.Window('Blobs float32');
+let view02 = T.view(img02.getRaster());
+// Create the window content from the view
+win02.addView(view02);
+// Add the window to the DOM and display it
+win02.addToDOM('workspace');
+
+/**
+ * Display float32 images
+ */
 let img1 = new T.Image('uint8',256,254);
 img1.setPixels(blobs_pixels);
 let win1 = new T.Window('Blobs Salt&Pepper');
@@ -49,7 +78,7 @@ win21.addToDOM('workspace');
 const DEG = Math.PI/180.0;
 const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
 const sine = (pix,i,x,y) => Math.sin((x + 2*y) * 5 * DEG) * 100 + 127;
-const halves = (pix,i,x,y,z,w,h) => (x > w/2) ? pix & 0xffffff00 | 0x80 : pix;
+const halves = (pix,i,x,y,z,w,h) => (x > w/2) ? pix & 0xffffff | 0x80000000 : pix;
 
 // Spiral
 let img3 = new T.Image('uint8',300,300);

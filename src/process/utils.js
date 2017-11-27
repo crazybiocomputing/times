@@ -22,7 +22,10 @@
  * Jean-Christophe Taveau
  */
 
-'use script';
+'use strict';
+
+import {TIMES} from '../TIMES';
+
 
 /**
  * Extract alpha (transparency) component of RGBA pixel value
@@ -55,6 +58,27 @@ const clampUint8 = clamp(0,255);
  */
 const clampUint16 = clamp(0,65535);
 
+/**
+ * Check Endianness
+ *
+ * @author Jean-Christophe Taveau
+ */
+const isLittleEndian = () => {
+  const checkEndianness = () => {
+    // https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
+    let buf = new ArrayBuffer(4);
+    let buf8 = new Uint8ClampedArray(buf);
+    let data = new Uint32Array(buf);
+    
+    // Determine whether Uint32 is little- or big-endian.
+    data[0] = 0x0a0b0c0d;
+    TIMES.cache.littleEndian = (buf8[0] === 0x0d);
+    return TIMES.cache.littleEndian;
+  };
+  
+  return (TIMES.cache.littleEndian !== undefined) ? TIMES.cache.littleEndian : checkEndianness();
+
+};
 
 /**
  * pipe(func1, func2, func3, ..., funcn)
@@ -71,5 +95,5 @@ const pipe = (...fns) => (x,copy_mode=false) => fns.reduce((v, f,i) => {
 
 
 // Exports
-export {clamp,clampUint8,pipe};
+export {clamp,clampUint8,isLittleEndian,pipe};
 
