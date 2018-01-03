@@ -2,7 +2,7 @@
  *
  */
 const loadAndProcess = (theFile,data) => {
-  const sample = T.loadImage(data);
+  const sample = io.loadImage(data);
   // Once the image is loaded, trigger the processing
   sample.then( (result) => {
     // Update image info
@@ -13,7 +13,7 @@ const loadAndProcess = (theFile,data) => {
     img.metadata.file.lastModified = new Date(theFile.lastModified).toLocaleDateString() || 'n/a';
     // Do the processing
     let win1 = new T.Window(theFile.name + ' - org');
-    win1.addView(T.view(img.getRaster()));
+    win1.addView(cpu.view(img.getRaster()));
     win1.addToDOM('workspace');
     /*
     let win2 = new T.Window(theFile.name);
