@@ -7,7 +7,8 @@ module.exports = {
   output: {
     filename: 'TIMES.bundle.js',
     path: path.resolve(__dirname, 'javascripts'),
-    library: 'T'
+/*    library: 'T', */
+    libraryTarget: 'umd'
   },
   plugins: [
 /*    new UglifyJSPlugin({
