@@ -70,13 +70,13 @@ export default class View {
         render3D(win)(layer.data);
         break;
       case 'graphics':
-        T.renderVector(win)(layer.data);
+        cpu.renderVector(win)(layer.data);
         break;
       case 'image':
-        T.render2D(win)(layer.data);
+        cpu.render2D(win)(layer.data);
         break;
       case 'table':
-        T.renderTable(win)(layer.data);
+        cpu.renderTable(win)(layer.data);
         break;
       }
     }

@@ -22,6 +22,7 @@
  * Jean-Christophe Taveau
  */
  
+'use strict';
 
 /**
  * Class for Raster
@@ -105,7 +106,7 @@ export default class Raster {
   
   static fromWindow(win, copy = true) {
     let img = new TRaster(win.metadata.type,win.metadata.width,win.metadata.height);
-    img.pixelData (copy === true) ? [...win.raster.pixelData] : win.raster.pixelData; // Copy pixels
+    img.pixelData = (copy === true) ? [...win.raster.pixelData] : win.raster.pixelData; // Copy pixels
     img.setWindow(win);
     return img;
   }
@@ -119,7 +120,13 @@ export default class Raster {
   static from(other, copy = true) {
     let img = new T.Raster(other.type,other.width, other.height);
     img.parent = other.parent;
-    img.pixelData = (copy === true) ? [...other.pixelData] : other.pixelData; // Copy pixels
+    if (copy === true) {
+      img.setPixelData(other.pixelData); // Copy pixels
+    }
+    else {
+      img.pixelData = other.pixelData;  // No copy
+    }
+    
     return img;
   }
   
@@ -232,6 +239,20 @@ export default class Raster {
   }
 
   /**
+   * Set Raster Dimension
+   *
+   * @param {number} new_width - New Raster Width
+   * @param {number} new_height - New Raster Height
+   *
+   * @author Jean-Christophe Taveau
+   */
+  setDimension(new_width,new_height) {
+    this.width = new_width;
+    this.height = new_height;
+    this.length = new_width * new_height;
+  }
+
+  /**
    * Set pixel value at given X,Y-coordinates
    *
    * @param {number} x - Pixel X-coordinate
@@ -241,6 +262,32 @@ export default class Raster {
    */
   setPixel(x,y,value) {
     this.pixelData[x + y * this.width] = value;
+  }
+
+  /**
+   * Set pixels 
+   *
+   * @param {TypedArray} array - Pixel value
+   * @author Jean-Christophe Taveau
+   */
+  setPixelData(array) {
+    const table = {uint8: Uint8ClampedArray, uint16: Uint16Array, float32: Float32Array, rgba: Uint32Array };
+    // check if correct 
+    if (array instanceof table[this.type]) {
+      this.pixelData  = array;
+    }
+    else {
+      // Need a conversion
+      switch (this.type) {
+      case 'uint8': this.pixelData = new Uint8ClampedArray(array); break;
+      case 'uint16': this.pixelData = new Uint16Array(array);break;
+      case 'uint32': this.pixelData = new Uint32Array(array);break;
+      case 'float32': this.pixelData = new Float32Array(array);break;
+      case 'abgr':
+      case 'rgba': this.pixelData = new Uint32Array(array);break;
+      }
+    }
+
   }
 
   /**

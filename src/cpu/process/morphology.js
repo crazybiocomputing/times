@@ -22,7 +22,7 @@
  * Jean-Christophe Taveau
  */
 
-'use script';
+'use strict';
 
 /**
  * Description: TODO

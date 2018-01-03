@@ -37,7 +37,7 @@ win02.addView(view02);
 win02.addToDOM('workspace');
 
 /**
- * Display float32 images
+ * Display uint8 + noise
  */
 let img1 = new T.Image('uint8',256,254);
 img1.setPixels(blobs_pixels);
@@ -61,6 +61,9 @@ win2.addView(view2);
 // Add the window to the DOM and display it
 win2.addToDOM('workspace');
 
+/**
+ * Display rgba + crop
+ */
 let img21 = new T.Image('rgba',320,200);
 img21.setPixels(clown_pixels);
 let process = T.pipe(T.crop(140,23,112,103),T.view);
@@ -78,7 +81,7 @@ win21.addToDOM('workspace');
 const DEG = Math.PI/180.0;
 const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
 const sine = (pix,i,x,y) => Math.sin((x + 2*y) * 5 * DEG) * 100 + 127;
-const halves = (pix,i,x,y,z,w,h) => (x > w/2) ? pix & 0xffffff | 0x80000000 : pix;
+const halves = (pix,i,x,y,z,w,h) => (x > w/2) ? T.toRGBA(T.red(pix),T.green(pix),T.blue(pix),0x80) : pix;
 
 // Spiral
 let img3 = new T.Image('uint8',300,300);
@@ -107,6 +110,7 @@ let win5 = new T.Window('Clown and Transparency');
 win5.addView(view5);
 // Add the window to the DOM and display it
 win5.addToDOM('workspace');
+
 
 /**
  * Raster Calc

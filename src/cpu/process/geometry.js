@@ -22,7 +22,7 @@
  * Jean-Christophe Taveau
  */
 
-'use script';
+'use strict';
 
 /**
  * @module geometry
@@ -48,7 +48,7 @@ const crop = (top_left_x, top_left_y,new_width,new_height) => (raster,copy_mode=
     },[]);
   output.width = new_width;
   output.height = new_height;
-  output.pixelData = [...pixels];
+  output.setPixelData(pixels);
   return output;
 }
   

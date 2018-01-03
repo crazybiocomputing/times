@@ -164,9 +164,12 @@ const isLittleEndian = () => {
  *
  * @author Eric Elliott
  */
-const pipe = (...fns) => (x,copy_mode=false) => fns.reduce((v, f,i) => {
-  return f(v,copy_mode);
-  }, x);
+const pipe = (...fns) => (raster,copy_mode=false) => {
+  let fullCopy = T.Raster.from(raster,true);
+  return fns.reduce((v, f,i) => {
+    return f(v,copy_mode);
+    }, fullCopy);
+}
 
 
 
@@ -386,6 +389,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  */
  
 
+
 /**
  * Class for Raster
  *
@@ -468,7 +472,7 @@ class Raster {
   
   static fromWindow(win, copy = true) {
     let img = new TRaster(win.metadata.type,win.metadata.width,win.metadata.height);
-    img.pixelData (copy === true) ? [...win.raster.pixelData] : win.raster.pixelData; // Copy pixels
+    img.pixelData = (copy === true) ? [...win.raster.pixelData] : win.raster.pixelData; // Copy pixels
     img.setWindow(win);
     return img;
   }
@@ -482,7 +486,13 @@ class Raster {
   static from(other, copy = true) {
     let img = new T.Raster(other.type,other.width, other.height);
     img.parent = other.parent;
-    img.pixelData = (copy === true) ? [...other.pixelData] : other.pixelData; // Copy pixels
+    if (copy === true) {
+      img.setPixelData(other.pixelData); // Copy pixels
+    }
+    else {
+      img.pixelData = other.pixelData;  // No copy
+    }
+    
     return img;
   }
   
@@ -604,6 +614,32 @@ class Raster {
    */
   setPixel(x,y,value) {
     this.pixelData[x + y * this.width] = value;
+  }
+
+  /**
+   * Set pixels 
+   *
+   * @param {TypedArray} array - Pixel value
+   * @author Jean-Christophe Taveau
+   */
+  setPixelData(array) {
+    const table = {uint8: Uint8ClampedArray, uint16: Uint16Array, float32: Float32Array, rgba: Uint32Array };
+    // check if correct 
+    if (array instanceof table[this.type]) {
+      this.pixelData  = array;
+    }
+    else {
+      // Need a conversion
+      switch (this.type) {
+      case 'uint8': this.pixelData = new Uint8ClampedArray(array); break;
+      case 'uint16': this.pixelData = new Uint16Array(array);break;
+      case 'uint32': this.pixelData = new Uint32Array(array);break;
+      case 'float32': this.pixelData = new Float32Array(array);break;
+      case 'abgr':
+      case 'rgba': this.pixelData = new Uint32Array(array);break;
+      }
+    }
+
   }
 
   /**
@@ -1378,7 +1414,7 @@ const loadImage = (data) => {
       let w = img.width;
       let h = img.height;
       // Create T.Image
-      let timg = new T.Image('abgr', w, h);
+      let timg = new T.Image('rgba', w, h);
       
       // Load image from canvas
       let canvas = document.createElement('canvas');
@@ -1692,7 +1728,7 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
  * Jean-Christophe Taveau
  */
 
-'use script';
+
 
 /**
  * @module geometry
@@ -1718,7 +1754,7 @@ const crop = (top_left_x, top_left_y,new_width,new_height) => (raster,copy_mode=
     },[]);
   output.width = new_width;
   output.height = new_height;
-  output.pixelData = [...pixels];
+  output.setPixelData(pixels);
   return output;
 }
   
@@ -1906,14 +1942,14 @@ const fill = (func) => (raster,copy_mode=true) => {
   let cx = w / 2.0;
   let cy = h / 2.0;
   let cz = nz / 2.0;
-  
+  console.log(raster.pixelData);
   raster.pixelData.forEach ( (px,i,arr) => {
     let x = i % w;
     let y = Math.floor(i / w);
     let z = Math.floor( i / w / h);
     let d = Math.sqrt ((x - cx)**2 + (y - cy)**2 + (z - cz)**2);
     let a = Math.atan2(y,x);
-    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+    arr[i] = func(px,i,x,y,z,w,h,a,d);
   });
   return raster;
 };
@@ -2441,16 +2477,16 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
  *
  * @author Jean-Christophe Taveau
  */
-const renderRGBA = (win) => (img,copy=true) => {
+const renderRGBA = (win) => (raster,copy=true) => {
   // Tutorial: https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
-  let imgdata = win.ctx.createImageData(img.width, img.height);
+  let imgdata = win.ctx.createImageData(raster.width, raster.height);
 
   // New RGBA image buffer
-  let buf = new ArrayBuffer(img.width * img.height * 4);
-  let buf32 = new Uint32Array(buf);
-  let buf8 = new Uint8Array(buf);
+  // let buf = new ArrayBuffer(img.width * img.height * 4);
+  // let buf32 = new Uint32Array(buf);
+  let buf8 = new Uint8Array(raster.pixelData.buffer);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = img.pixelData[i]);
+  // buf32.forEach( (px,i,arr) => arr[i] = img.pixelData[i]);
   // T.toRGBA(T.red(img.pixelData[i]),T.green(img.pixelData[i]),T.blue(img.pixelData[i]),T.alpha(img.pixelData[i]) ) );
 
   imgdata.data.set(buf8);

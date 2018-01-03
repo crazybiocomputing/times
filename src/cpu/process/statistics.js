@@ -65,6 +65,7 @@ const histogram = (binNumber) => (raster, copy_mode = true) => {
   // Update statistics
   let stats = T.statistics(raster);
   let delta = (raster.statistics.max - raster.statistics.min);
+  raster.statistics.binSize = binNumber / delta;
   raster.statistics.histogram = raster.pixelData.reduce ((bins,px,i) => {
     let index = T.clamp(0,binNumber)( Math.floor( (binNumber - 1) * (px - raster.statistics.min)/ delta));
     bins[index]++;

@@ -130,7 +130,7 @@ const fill = (func) => (raster,copy_mode=true) => {
     let z = Math.floor( i / w / h);
     let d = Math.sqrt ((x - cx)**2 + (y - cy)**2 + (z - cz)**2);
     let a = Math.atan2(y,x);
-    raster.pixelData[i] = func(px,i,x,y,z,w,h,a,d);
+    arr[i] = func(px,i,x,y,z,w,h,a,d);
   });
   return raster;
 };
@@ -161,7 +161,7 @@ const fill = (func) => (raster,copy_mode=true) => {
   *
   * @author Jean-Christophe Taveau
   */
-const math = (func) => (raster,copy_mode=true) => T.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
+const math = (func) => (raster,copy_mode=true) => cpu.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
 
 /**
  * Image Calculator. Combine two images by operation

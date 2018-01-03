@@ -49,7 +49,7 @@ const renderUint8 = (win) => (img8bit,copy=true) => {
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = T.toRGBA(img8bit.pixelData[i],img8bit.pixelData[i],img8bit.pixelData[i],255) );
+  buf32.forEach( (px,i,arr) => arr[i] = cpu.toRGBA(img8bit.pixelData[i],img8bit.pixelData[i],img8bit.pixelData[i],255) );
 
   imgdata.data.set(buf8);
   win.ctx.putImageData(imgdata, 0, 0);
@@ -74,7 +74,7 @@ const renderUint16 = (win) => (img16bit,copy=true) => {
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = T.toRGBA(img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,255) );
+  buf32.forEach( (px,i,arr) => arr[i] = cpu.toRGBA(img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,255) );
 
   imgdata.data.set(buf8);
   win.ctx.putImageData(imgdata, 0, 0);
@@ -95,7 +95,7 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
   let imgdata = win.ctx.createImageData(imgf32.width, imgf32.height);
   
   // Update statistics
-  let dummy = T.statistics(imgf32); 
+  let dummy = cpu.statistics(imgf32); 
   
   // New RGBA image buffer
   let buf = new ArrayBuffer(imgf32.length * 4);
@@ -105,7 +105,7 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
   let delta = 255.0 / (imgf32.statistics.max - imgf32.statistics.min) ;
   buf32.forEach( (px,i,arr) => {
     let pix = Math.floor((imgf32.pixelData[i] - imgf32.statistics.min) * delta );
-    arr[i] = T.toRGBA(pix,pix,pix,255);
+    arr[i] = cpu.toRGBA(pix,pix,pix,255);
   });
 
   imgdata.data.set(buf8);
@@ -122,16 +122,16 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
  *
  * @author Jean-Christophe Taveau
  */
-const renderRGBA = (win) => (img,copy=true) => {
+const renderRGBA = (win) => (raster,copy=true) => {
   // Tutorial: https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
-  let imgdata = win.ctx.createImageData(img.width, img.height);
+  let imgdata = win.ctx.createImageData(raster.width, raster.height);
 
   // New RGBA image buffer
-  let buf = new ArrayBuffer(img.width * img.height * 4);
-  let buf32 = new Uint32Array(buf);
-  let buf8 = new Uint8Array(buf);
+  // let buf = new ArrayBuffer(img.width * img.height * 4);
+  // let buf32 = new Uint32Array(buf);
+  let buf8 = new Uint8Array(raster.pixelData.buffer);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = img.pixelData[i]);
+  // buf32.forEach( (px,i,arr) => arr[i] = img.pixelData[i]);
   // T.toRGBA(T.red(img.pixelData[i]),T.green(img.pixelData[i]),T.blue(img.pixelData[i]),T.alpha(img.pixelData[i]) ) );
 
   imgdata.data.set(buf8);
@@ -143,13 +143,13 @@ const render2D = (win) => (img,copy=true) => {
   console.log(win);
   switch (img.raster.type) {
   case 'uint8':
-    T.renderUint8(win)(img.raster);
+    renderUint8(win)(img.raster);
     break;
   case 'uint16':
-    T.renderUint16(win)(img.raster);
+    renderUint16(win)(img.raster);
     break;
   case 'float32':
-    T.renderFloat32(win)(img.raster);
+    renderFloat32(win)(img.raster);
     break;
   case 'rgba':
   case 'abgr':
