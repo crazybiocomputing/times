@@ -1,5 +1,14 @@
-var T =
-/******/ (function(modules) { // webpackBootstrap
+(function webpackUniversalModuleDefinition(root, factory) {
+	if(typeof exports === 'object' && typeof module === 'object')
+		module.exports = factory();
+	else if(typeof define === 'function' && define.amd)
+		define([], factory);
+	else {
+		var a = factory();
+		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
+	}
+})(this, function() {
+return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
 /******/
@@ -71,9 +80,11 @@ var T =
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return clamp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return clampUint8; });
+/* unused harmony export histogram */
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isLittleEndian; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return pipe; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TIMES__ = __webpack_require__(1);
+/* unused harmony export statistics */
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_TIMES__ = __webpack_require__(1);
 /*
  *  times: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -104,11 +115,11 @@ var T =
 
 
 /**
- * Extract alpha (transparency) component of RGBA pixel value
+ * TODO
  */
 const append = function (obj) {
-  __WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].storage.push(obj);
-  return __WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].storage;
+  __WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].storage.push(obj);
+  return __WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].storage;
 }
 
 /**
@@ -148,11 +159,11 @@ const isLittleEndian = () => {
     
     // Determine whether Uint32 is little- or big-endian.
     data[0] = 0x0a0b0c0d;
-    __WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].cache.littleEndian = (buf8[0] === 0x0d);
-    return __WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].cache.littleEndian;
+    __WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].cache.littleEndian = (buf8[0] === 0x0d);
+    return __WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].cache.littleEndian;
   };
   
-  return (__WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].cache.littleEndian !== undefined) ? __WEBPACK_IMPORTED_MODULE_0__TIMES__["a" /* TIMES */].cache.littleEndian : checkEndianness();
+  return (__WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].cache.littleEndian !== undefined) ? __WEBPACK_IMPORTED_MODULE_0__core_TIMES__["a" /* TIMES */].cache.littleEndian : checkEndianness();
 
 };
 
@@ -171,6 +182,65 @@ const pipe = (...fns) => (raster,copy_mode=false) => {
     }, fullCopy);
 }
 
+/**
+ * Computes basic stats: min, max, mean/average and standard deviation of the image.
+ * Algorithm for variance found in <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm">Wikipedia</a>
+ * 
+ * @param {Raster} img - Input raster
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {Raster} - Returns a raster with updated statistics: min, max, mean, variance
+ *
+ * @author Jean-Christophe Taveau
+ */
+const statistics = (img, copy_mode = true) => {
+  let tmp = img.pixelData.reduce ( (accu,px,i) => {
+    accu.min = Math.min(accu.min,px);
+    accu.max = Math.max(accu.max,px);
+    accu.mean += px;
+    accu.n++;
+    let delta = px - accu.mean2;
+    accu.mean2 += delta/accu.n;
+    accu.variance += delta * delta;
+    return accu;
+  },
+  {min: Number.MAX_SAFE_INTEGER, max: 0, mean: 0.0, mean2 : 0.0, n: 0, variance: 0.0}
+  );
+
+  // Update stats in this TRaster
+  img.statistics = {
+    min: tmp.min,
+    max: tmp.max,
+    count : img.pixelData.length,
+    mean : tmp.mean / img.pixelData.length,
+    stddev : Math.sqrt(tmp.variance / img.pixelData.length)
+  };
+  return img;
+};
+
+/**
+ * Computes histogram of the image.
+ * Algorithm for variance found in <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm">Wikipedia</a>
+ * 
+ * @param {number} binNumber - Bin Number
+ * @param {Raster} img - Input raster
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {Raster} - Returns a raster with updated histogram
+ *
+ * @author Jean-Christophe Taveau
+ */
+const histogram = (binNumber) => (raster, copy_mode = true) => {
+  // Update statistics
+  let stats = T.statistics(raster);
+  let delta = (raster.statistics.max - raster.statistics.min);
+  raster.statistics.histogram = raster.pixelData.reduce ((bins,px,i) => {
+    let index = T.clamp(0,binNumber)( Math.floor( (binNumber - 1) * (px - raster.statistics.min)/ delta));
+    bins[index]++;
+    return bins;
+    },
+    new Array(binNumber).fill(0)
+  );
+  return raster;
+};
 
 
 // Exports
@@ -224,70 +294,71 @@ TIMES.initStorage = () => TIMES.storage = [];
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_index_js__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__io_loadImage__ = __webpack_require__(10);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__ = __webpack_require__(11);
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "T", function() { return __WEBPACK_IMPORTED_MODULE_0__core_index_js__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "io", function() { return __WEBPACK_IMPORTED_MODULE_1__io_loadImage__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "cpu", function() { return __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+
+/* core classes */
+
+
+/* io/loadImage */
+
+
+/* cpu/ */
+
+
+
+
+
+
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TIMES__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Raster__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Image__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Stack__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Volume__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Window__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__View__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__io_loadImage__ = __webpack_require__(9);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_color__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__process_geometry__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__process_math__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__process_noise__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__process_statistics__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_14__process_type__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_15__render_view__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_16__render_render2D__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_17__render_renderVector__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Raster__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Image__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Stack__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Volume__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Window__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__View__ = __webpack_require__(9);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Raster", function() { return __WEBPACK_IMPORTED_MODULE_1__Raster__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return __WEBPACK_IMPORTED_MODULE_2__Image__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Stack", function() { return __WEBPACK_IMPORTED_MODULE_3__Stack__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Volume", function() { return __WEBPACK_IMPORTED_MODULE_4__Volume__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Window", function() { return __WEBPACK_IMPORTED_MODULE_5__Window__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "View", function() { return __WEBPACK_IMPORTED_MODULE_6__View__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "loadImage", function() { return __WEBPACK_IMPORTED_MODULE_7__io_loadImage__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_8__process_utils__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clampUint8", function() { return __WEBPACK_IMPORTED_MODULE_8__process_utils__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_8__process_utils__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "alpha", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceRed", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["l"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["j"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_9__process_color__["k"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_10__process_geometry__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "black", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chessboard", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "math", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "spiral", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "white", function() { return __WEBPACK_IMPORTED_MODULE_11__process_math__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noise", function() { return __WEBPACK_IMPORTED_MODULE_12__process_noise__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_12__process_noise__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "histogram", function() { return __WEBPACK_IMPORTED_MODULE_13__process_statistics__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "statistics", function() { return __WEBPACK_IMPORTED_MODULE_13__process_statistics__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fromABGRtoUint8", function() { return __WEBPACK_IMPORTED_MODULE_14__process_type__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_15__render_view__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_15__render_view__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint16", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderFloat32", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderABGR", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_16__render_render2D__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_17__render_renderVector__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -323,44 +394,13 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 
-/* io/loadImage */
-
-
-/* Process/utils */
-
-
-/* Process/color */
-
-
-/* Process/geometry */
-
-
-/* Process/math */
-
-
-/* Process/noise */
-
-
-//* Process/statistics */
-
-
-//* Process/type */
-
-
-/* Render/view */
-
-
-/* Render */
-
-
-
 
 
 
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -605,6 +645,20 @@ class Raster {
   }
 
   /**
+   * Set Raster Dimension
+   *
+   * @param {number} new_width - New Raster Width
+   * @param {number} new_height - New Raster Height
+   *
+   * @author Jean-Christophe Taveau
+   */
+  setDimension(new_width,new_height) {
+    this.width = new_width;
+    this.height = new_height;
+    this.length = new_width * new_height;
+  }
+
+  /**
    * Set pixel value at given X,Y-coordinates
    *
    * @param {number} x - Pixel X-coordinate
@@ -659,7 +713,7 @@ class Raster {
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -687,7 +741,7 @@ class Raster {
  * Jean-Christophe Taveau
  */
  
-'use script';
+
 
 /**
  * Class for Image
@@ -811,7 +865,7 @@ class Image {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -960,7 +1014,7 @@ class Stack {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1058,7 +1112,7 @@ class Volume {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1209,7 +1263,7 @@ class Window {
         let pix = (the_view.layers[0].data.raster.type === 'float32') ? pixels[x + y * w] : pixels[x + y * w] >>>0;
         let message = `(${x},${y}): ${pix}`;
         if (the_view.layers[0].data.raster.type === 'rgba' || the_view.layers[0].data.raster.type === 'abgr') {
-          message = `(${x},${y}): rgba(${T.red(pix)},${T.green(pix)},${T.blue(pix)},${T.alpha(pix)})`;
+          message = `(${x},${y}): rgba(${cpu.red(pix)},${cpu.green(pix)},${cpu.blue(pix)},${cpu.alpha(pix)})`;
         }
         let info = canvas.parentNode.nextSibling;
         info.innerHTML = message;
@@ -1265,7 +1319,7 @@ class Window {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1341,13 +1395,13 @@ class View {
         render3D(win)(layer.data);
         break;
       case 'graphics':
-        T.renderVector(win)(layer.data);
+        cpu.renderVector(win)(layer.data);
         break;
       case 'image':
-        T.render2D(win)(layer.data);
+        cpu.render2D(win)(layer.data);
         break;
       case 'table':
-        T.renderTable(win)(layer.data);
+        cpu.renderTable(win)(layer.data);
         break;
       }
     }
@@ -1358,11 +1412,12 @@ class View {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return loadImage; });
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "loadImage", function() { return loadImage; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -1444,7 +1499,120 @@ const loadImage = (data) => {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__process_utils__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__process_color__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__process_geometry__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__process_math__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__process_noise__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__process_statistics__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_type__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__render_view__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__render_render2D__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__render_renderVector__ = __webpack_require__(20);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clampUint8", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "alpha", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "luminance", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceRed", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chrominanceBlue", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "hue", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saturation", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "value", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["k"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_2__process_geometry__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "black", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chessboard", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "math", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "spiral", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "white", function() { return __WEBPACK_IMPORTED_MODULE_3__process_math__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noise", function() { return __WEBPACK_IMPORTED_MODULE_4__process_noise__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_4__process_noise__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "histogram", function() { return __WEBPACK_IMPORTED_MODULE_5__process_statistics__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "statistics", function() { return __WEBPACK_IMPORTED_MODULE_5__process_statistics__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fromABGRtoUint8", function() { return __WEBPACK_IMPORTED_MODULE_6__process_type__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_7__render_view__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_7__render_view__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint16", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderFloat32", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderABGR", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_8__render_render2D__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_9__render_renderVector__["a"]; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+ 
+ /* Process/utils */
+
+
+/* Process/color */
+
+
+/* Process/geometry */
+
+
+/* Process/math */
+
+
+/* Process/noise */
+
+
+//* Process/statistics */
+
+
+//* Process/type */
+
+
+/* Render/view */
+
+
+/* Render */
+
+
+
+
+
+
+
+
+/***/ }),
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1699,7 +1867,7 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1804,7 +1972,7 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1942,7 +2110,7 @@ const fill = (func) => (raster,copy_mode=true) => {
   let cx = w / 2.0;
   let cy = h / 2.0;
   let cz = nz / 2.0;
-  console.log(raster.pixelData);
+  
   raster.pixelData.forEach ( (px,i,arr) => {
     let x = i % w;
     let y = Math.floor(i / w);
@@ -1980,7 +2148,7 @@ const fill = (func) => (raster,copy_mode=true) => {
   *
   * @author Jean-Christophe Taveau
   */
-const math = (func) => (raster,copy_mode=true) => T.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
+const math = (func) => (raster,copy_mode=true) => cpu.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
 
 /**
  * Image Calculator. Combine two images by operation
@@ -2013,7 +2181,7 @@ const calc = (other,func) => (raster,copy_mode=true) => {
 
 
 /***/ }),
-/* 13 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2098,7 +2266,7 @@ const noise = (standardDeviation = 25.0) => (raster,copy_mode = true) => {
 
 
 /***/ }),
-/* 14 */
+/* 16 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2171,6 +2339,7 @@ const histogram = (binNumber) => (raster, copy_mode = true) => {
   // Update statistics
   let stats = T.statistics(raster);
   let delta = (raster.statistics.max - raster.statistics.min);
+  raster.statistics.binSize = binNumber / delta;
   raster.statistics.histogram = raster.pixelData.reduce ((bins,px,i) => {
     let index = T.clamp(0,binNumber)( Math.floor( (binNumber - 1) * (px - raster.statistics.min)/ delta));
     bins[index]++;
@@ -2188,7 +2357,7 @@ const histogram = (binNumber) => (raster, copy_mode = true) => {
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2250,7 +2419,7 @@ const fromABGRtoUint8 = (func) => (raster,copy=true) => {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2342,7 +2511,7 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2404,7 +2573,7 @@ const renderUint8 = (win) => (img8bit,copy=true) => {
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = T.toRGBA(img8bit.pixelData[i],img8bit.pixelData[i],img8bit.pixelData[i],255) );
+  buf32.forEach( (px,i,arr) => arr[i] = cpu.toRGBA(img8bit.pixelData[i],img8bit.pixelData[i],img8bit.pixelData[i],255) );
 
   imgdata.data.set(buf8);
   win.ctx.putImageData(imgdata, 0, 0);
@@ -2429,7 +2598,7 @@ const renderUint16 = (win) => (img16bit,copy=true) => {
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
-  buf32.forEach( (px,i,arr) => arr[i] = T.toRGBA(img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,255) );
+  buf32.forEach( (px,i,arr) => arr[i] = cpu.toRGBA(img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,img16bit.pixelData[i] >> 8,255) );
 
   imgdata.data.set(buf8);
   win.ctx.putImageData(imgdata, 0, 0);
@@ -2450,7 +2619,7 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
   let imgdata = win.ctx.createImageData(imgf32.width, imgf32.height);
   
   // Update statistics
-  let dummy = T.statistics(imgf32); 
+  let dummy = cpu.statistics(imgf32); 
   
   // New RGBA image buffer
   let buf = new ArrayBuffer(imgf32.length * 4);
@@ -2460,7 +2629,7 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
   let delta = 255.0 / (imgf32.statistics.max - imgf32.statistics.min) ;
   buf32.forEach( (px,i,arr) => {
     let pix = Math.floor((imgf32.pixelData[i] - imgf32.statistics.min) * delta );
-    arr[i] = T.toRGBA(pix,pix,pix,255);
+    arr[i] = cpu.toRGBA(pix,pix,pix,255);
   });
 
   imgdata.data.set(buf8);
@@ -2498,13 +2667,13 @@ const render2D = (win) => (img,copy=true) => {
   console.log(win);
   switch (img.raster.type) {
   case 'uint8':
-    T.renderUint8(win)(img.raster);
+    renderUint8(win)(img.raster);
     break;
   case 'uint16':
-    T.renderUint16(win)(img.raster);
+    renderUint16(win)(img.raster);
     break;
   case 'float32':
-    T.renderFloat32(win)(img.raster);
+    renderFloat32(win)(img.raster);
     break;
   case 'rgba':
   case 'abgr':
@@ -2520,7 +2689,7 @@ const render2D = (win) => (img,copy=true) => {
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2576,3 +2745,4 @@ const renderVector = (win) => (obj,copy=true) => {
 
 /***/ })
 /******/ ]);
+});
