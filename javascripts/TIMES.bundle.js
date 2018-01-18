@@ -80,9 +80,11 @@ return /******/ (function(modules) { // webpackBootstrap
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return clamp; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return clampUint8; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return degrees; });
 /* unused harmony export histogram */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return isLittleEndian; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return pipe; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return isLittleEndian; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return pipe; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return radians; });
 /* unused harmony export statistics */
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_TIMES__ = __webpack_require__(1);
 /*
@@ -144,6 +146,23 @@ const clampUint8 = clamp(0,255);
  * @author Jean-Christophe Taveau
  */
 const clampUint16 = clamp(0,65535);
+
+/**
+ * Convert radians to degrees
+ *
+ * @author Jean-Christophe Taveau
+ */
+const degrees = (radian_angle) => radian_angle * 180.0 / Math.PI;
+
+
+/**
+ * Convert degrees to radians
+ *
+ * @author Jean-Christophe Taveau
+ */
+const radians = (degree_angle) => degree_angle * Math.PI / 180.0;
+
+
 
 /**
  * Check Endianness
@@ -297,9 +316,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_index_js__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__io_loadImage__ = __webpack_require__(10);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_index_js__ = __webpack_require__(21);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "T", function() { return __WEBPACK_IMPORTED_MODULE_0__core_index_js__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "io", function() { return __WEBPACK_IMPORTED_MODULE_1__io_loadImage__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "cpu", function() { return __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__; });
+/* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "gpu", function() { return __WEBPACK_IMPORTED_MODULE_3__gpu_index_js__; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -332,6 +353,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* cpu/ */
+
+
+/* gpu/ */
 
 
 
@@ -1516,7 +1540,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__render_renderVector__ = __webpack_require__(20);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clampUint8", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "degrees", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "pipe", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "radians", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["f"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "red", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["h"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blue", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "green", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["e"]; });
@@ -1676,7 +1702,7 @@ const clampUint8 = Object(__WEBPACK_IMPORTED_MODULE_0__utils__["a" /* clamp */])
  * @param {number} gray8 - uint8 gray value 
  * @return {number} color Pixel value 
  */
-const fromGray8 = (gray8) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? 0xff000000 | gray8 << 16 | gray8 << 8 | gray8 & 0xff : gray8 << 24 | gray8 << 16 | gray8 << 8 | 0xff;
+const fromGray8 = (gray8) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? 0xff000000 | gray8 << 16 | gray8 << 8 | gray8 & 0xff : gray8 << 24 | gray8 << 16 | gray8 << 8 | 0xff;
 
 /**
  * Convert color pixel value to an array with red, green, blue, and alpha uint8 values
@@ -1698,7 +1724,7 @@ const fromABGR = (abgr) => ( abgr << 24) | (abgr << 16) | (abgr << 8) | abgr;
  * @param {number} alpha - uint8 alpha component 
  * @return {number} ABGR Pixel value 
  */
-const toRGBA = (r,g,b,a) => (Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? (( a << 24) | (b << 16) | (g << 8) | r) : (( r << 24) | (g << 16) | b << 8) | a);
+const toRGBA = (r,g,b,a) => (Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? (( a << 24) | (b << 16) | (g << 8) | r) : (( r << 24) | (g << 16) | b << 8) | a);
 
 // TODO
 const toabgr = (color) => ( (color & 0xff) << 24) | ( (color & 0x00ff00) << 8) | ( (color & 0xff0000) >> 8) | ( (color & 0xff000000) >> 24);
@@ -1708,28 +1734,28 @@ const toabgr = (color) => ( (color & 0xff) << 24) | ( (color & 0x00ff00) << 8) |
  * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const alpha = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? color >> 24 & 0xff : color & 0xff;
+const alpha = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? color >> 24 & 0xff : color & 0xff;
 
 /**
  * Extract green component of color pixel value
  * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const blue = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? color >> 16 & 0xff : color >> 8 & 0xff;
+const blue = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? color >> 16 & 0xff : color >> 8 & 0xff;
 
 /**
  * Extract blue component of color pixel value
  * @param {number} color - color Pixel value 
  * @return {number} uint8 value 
  */
-const green = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? color >> 8 & 0xff : color >> 16 & 0xff;
+const green = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? color >> 8 & 0xff : color >> 16 & 0xff;
 
 /**
  * Extract alpha (transparency) component of color pixel value
  * @param {number} color - color Pixel value 
  * @return {number} - uint8 value 
  */
-const red = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["c" /* isLittleEndian */])() ? color & 0xff : color >> 24 & 0xff;
+const red = (color) => Object(__WEBPACK_IMPORTED_MODULE_0__utils__["d" /* isLittleEndian */])() ? color & 0xff : color >> 24 & 0xff;
 
 /**
  * Compute Luminance gray value from color pixel value
@@ -2055,7 +2081,7 @@ const ramp = (px,i,x,y,z,w,h) => x / w * 255;
   *
   * @author Jean-Christophe Taveau
   */
-const spiral = (px,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10 + a * DEG)+1);
+const spiral = (px,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10 + cpu.radians(a))+1);
 
 /**
   * Pattern `black`. Must be used with T.fill(..)
@@ -2740,6 +2766,836 @@ const renderVector = (win) => (obj,copy=true) => {
 
 // Exports
  
+
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_utils__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Processor__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gpu_math__ = __webpack_require__(24);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createGPU", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createProgram", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "getGraphicsContext", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Processor", function() { return __WEBPACK_IMPORTED_MODULE_1__Processor__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_2__gpu_math__["a"]; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+
+/* gpu/gpu_utils */
+
+
+/* gpu/Processor*/
+
+
+/* gpu/math*/
+
+
+
+
+
+
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createGPU; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return getGraphicsContext; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createProgram; });
+/* unused harmony export rectangle */
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+
+
+/**
+ * Toolbox for GPU
+ *
+ */
+
+/**
+ * Create a GPU Processor
+ *
+ * @author Jean-Christophe Taveau
+ */
+const createGPU = (graphics,width=-1,height=-1) => new gpu.Processor(graphics.context,graphics.canvas,width,height);
+  
+
+/**
+ *
+ * Init WebGL2
+ *
+ */
+const getGraphicsContext = (elementID='preview') => {
+  let _canvas = document.getElementById(elementID);
+  let gl2;
+  try {
+    gl2 = _canvas.getContext("webgl2");
+    
+    const ext = gl2.getExtension("EXT_color_buffer_float");
+    if (!ext) {
+      alert("need EXT_color_buffer_float");
+    }
+  } catch (e) {
+  }
+  if (!gl2) {
+      alert("Could not initialise WebGL2, sorry :-(");
+  }
+  return {canvas: _canvas, context: gl2};
+};
+
+
+/**
+ *
+ * Create Shader Program
+ *
+ */
+const createProgram = (gpuEnv,src_vs,src_fs) => {
+
+  // Compile shader
+  const compileShader = (gl, source,type) => {
+    let str = source;
+
+    let shader;
+    if (type == "fragment") {
+      shader = gl.createShader(gl.FRAGMENT_SHADER);
+    } else if (type == "vertex") {
+      shader = gl.createShader(gl.VERTEX_SHADER);
+    } else {
+      return null;
+    }
+
+    gl.shaderSource(shader, str);
+    gl.compileShader(shader);
+
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      alert(` ${type}: ${gl.getShaderInfoLog(shader)}`);
+      return null;
+    }
+
+    return shader;
+  };
+
+  /**** MAIN ****/
+  
+  let shader = {
+    program: null,
+    attributes: {},
+    uniforms: {}
+  };
+
+  let gl = gpuEnv.context;
+  
+  //1- Check in source(s) where are the attributes (keyword`in `)
+  let re = /in\s*(\w+)\s(\w+)/gm;
+  let result;
+  while ((result = re.exec(src_vs)) !== null) {
+    // console.log(re.exec(src_vs));
+    shader.attributes[result[2]] = {type: result[1],name: result[2],location: null};
+  }
+  // Check in source(s) where are the uniforms (keyword: `uniform`)
+  re = /uniform\s*(\w+)\s+(\w+)\s*(\[)*/gm;
+  while ((result = re.exec(src_vs)) !== null) {
+    // console.log(re.exec(src_vs));
+    shader.uniforms[result[2]] = {type: result[1]+(result[3]?'[]':''),name: result[2],location: null};
+  }
+  while ((result = re.exec(src_fs)) !== null) {
+    // console.log(re.exec(src_vs));
+    shader.uniforms[result[2]] = {type: result[1]+(result[3]?'[]':''),name: result[2],location: null};
+  }
+  console.log(shader);
+
+  // 2- Create Shader Program with link step.
+  shader.program = gl.createProgram();
+  
+  gl.attachShader(shader.program, compileShader(gl,src_vs,'vertex'));
+  gl.attachShader(shader.program, compileShader(gl,src_fs,'fragment'));
+  gl.linkProgram(shader.program);
+
+  if (!gl.getProgramParameter(shader.program, gl.LINK_STATUS)) {
+    alert("Could not initialise shaders");
+  }
+  
+  // 3- Get Attribute and Uniform locations
+  Object.values(shader.attributes).forEach( (attr) => attr.location =  gl.getAttribLocation(shader.program, attr.name) );
+  Object.values(shader.uniforms).forEach( (uniform) => uniform.location =  gl.getUniformLocation(shader.program, uniform.name) );
+  return shader;
+}
+
+/**
+ * Create a rectangle for gpu.Processor.geometry(..) function
+ *
+ * @author Jean-Christophe Taveau
+ */
+
+const rectangle = (w,h) => ({
+    type: 'TRIANGLE_STRIP', 
+    num: 4,
+    vertices: new Float32Array(
+      [
+        0.0,0.0,0.0,0.0,
+        0.0,h  ,0.0,1.0,
+        w  ,0.0,1.0,0.0,
+        w  ,h  ,1.0,1.0
+      ]
+    )
+  });
+
+// Export
+
+
+
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+
+
+
+class Processor {
+  constructor(context,canvas,width=-1,height=-1) {
+    this.context = context; 
+    this.canvas = canvas;
+    this.canvas.width = width;
+    this.canvas.height = height;
+    this.width = width;
+    this.height = height;
+    this.geometries = {};
+    this.textures = [];
+    this.attributes= {};
+    this.uniforms = {};
+    this.framebuffers = {};
+  }
+
+  attribute(a_name,a_num,a_type,a_stride,a_offset) {
+    this.attributes[a_name] = {
+      name: a_name,
+      num : a_num,
+      type: a_type, 
+      stride: a_stride,
+      offset: a_offset,
+      location: null
+    };
+    return this;
+  }
+
+  clearCanvas(color = [0.1,0.1,0.1,1.0]) {
+    let gl = this.context;
+    
+    // Define viewport
+    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    gl.clearColor(color[0],color[1],color[2],color[3]);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    
+    return this;
+  }
+  
+  /**
+   *
+   * primitives:
+   * - type: TRIANGLE_STRIP, POINTS, TRIANGLES, LINES
+   * - vertices: Float32Array([])
+   */
+  geometry(obj) {
+    let gl = this.context;
+    const glConstants = {
+      'TRIANGLE_STRIP' : gl.TRIANGLE_STRIP
+    };
+    
+    // Create vertices for rectangle
+    this.geometries.type = obj.type;
+    this.geometries.glType = glConstants[obj.type];
+    this.geometries.buffer = gl.createBuffer();
+    this.geometries.numVertices = obj.num;
+    gl.bindBuffer(gl.ARRAY_BUFFER,this.geometries.buffer);
+    gl.bufferData(gl.ARRAY_BUFFER,obj.vertices,gl.STATIC_DRAW);
+
+    // Unbind buffer(s)
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    
+    return this;
+  }
+  
+  /**
+   *
+   */
+   packWith(shaderProgram) {
+      let gl = this.context;
+      
+      this.shader = shaderProgram;
+      
+      // 1- Get Attribute and Uniform locations
+      Object.values(this.attributes).forEach( (attr) => {
+        attr.location =  shaderProgram.attributes[attr.name].location;
+        attr.component =  shaderProgram.attributes[attr.name].type;
+      });
+      
+      console.log(this.attributes);
+      
+      // 2- Create a VAO
+      this.vao = gl.createVertexArray();
+      gl.bindVertexArray(this.vao);
+      // 3- Bind the position buffer containing the vertices
+      gl.bindBuffer(gl.ARRAY_BUFFER, this.geometries.buffer);
+      // 4- Attributes
+      Object.values(this.attributes).forEach( (a) => {
+        console.log(a);
+        gl.enableVertexAttribArray(this.attributes[a.name].location);
+        gl.vertexAttribPointer(
+          this.attributes[a.name].location, 
+          this.attributes[a.name].num, 
+          gl.FLOAT, 
+          false, 
+          this.attributes[a.name].stride, 
+          this.attributes[a.name].offset
+        );
+        }
+      );
+      // Unbind buffers
+      gl.bindBuffer(gl.ARRAY_BUFFER, null);
+      gl.bindVertexArray(null);
+      return this;
+   }
+   
+  /**
+   * Render in a Frame Buffer
+   */
+  redirectTo(fbo_name,type='uint8',attachment=0) {
+    let gl = this.context;
+    
+    // Be sure no active framebuffer somewhere
+    // gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+    
+    if (this.framebuffers[fbo_name] === undefined) {
+      console.log('CREATE FBO');
+      let fbo = gl.createFramebuffer();
+
+      let internalFormat = gl.RGBA;
+      let srcType = gl.UNSIGNED_BYTE;
+      
+      if (type == 'uint16' || type === 'float32') {
+        internalFormat = gl.RGBA32F;
+        srcType = gl.FLOAT; 
+      }
+
+      let texture = this._createTexture(
+        gl,
+        null,
+        this.width,
+        this.height,
+        internalFormat,
+        gl.RGBA,
+        srcType,
+        gl.CLAMP_TO_EDGE,
+        gl.NEAREST,
+        gl.NEAREST
+      );
+        
+      gl.bindFramebuffer(gl.FRAMEBUFFER,fbo);
+      gl.framebufferTexture2D(
+        gl.FRAMEBUFFER,
+        gl.COLOR_ATTACHMENT0 + attachment,
+        gl.TEXTURE_2D,
+        texture,
+        0
+      );
+      
+      this.framebuffers[fbo_name] = {
+        id: 'framebuffer',
+        name: fbo_name,
+        buffer: fbo,
+        texture: texture
+      };
+    }
+    else {
+      gl.bindFramebuffer(gl.FRAMEBUFFER,this.framebuffers[fbo_name].buffer);
+    }
+    
+    gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[fbo_name].texture);
+    gl.viewport(0,0,this.width, this.height);
+    
+    return this;
+  }
+  
+  /**
+   * Update canvas size
+   */
+  size(w,h) {
+    this.canvas.width = w;
+    this.canvas.height = h;
+    this.width = w;
+    this.height = h;
+    return this;
+  }
+  
+  /*
+   * Pseudo-private - for Internal use, only
+   */
+  _createTexture (context,data,w,h,iformat,format,type, wrap,mini, mag) {
+    let gl = context;
+    
+    let texture = gl.createTexture();
+
+    // Bind it to texture unit 0' 2D bind point
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    // Set the parameters so we don't need mips and so we're not filtering
+    // and we don't repeat
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, wrap);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, wrap);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, mini);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, mag);
+    // Upload the image into the texture.
+    let mipLevel = 0;              // the largest mip
+    let internalFormat = iformat;   // format we want in the texture
+    let srcFormat = format;        // format of data we are supplying
+    let srcType = type;            // type of data we are supplying
+    
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      mipLevel,
+      internalFormat,
+      w,
+      h,
+      0, // Border
+      srcFormat,
+      srcType,
+      data
+    );
+
+    // Job finished: Unbind texture
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    
+    return texture;
+  };
+
+  /**
+ *
+ */
+  texture(raster,unit=0, wrap='clamp',mini='nearest', mag= 'nearest') {
+  
+    console.log('RASTER ? ...');
+    if (raster.id !== undefined && raster.id === 'framebuffer') {
+      console.log('No, FBO...');
+      this.textures[0] = {texture: raster.texture, unit: unit};
+      return this;
+    }
+    console.log('Yes, Raster!');
+    console.log(raster);
+    
+    let gl = this.context;
+    
+    const glConstants = {
+      'clamp' : gl.CLAMP_TO_EDGE,
+      'repeat' : gl.REPEAT,
+      'mirror' : gl.MIRRORED_REPEAT,
+      'nearest' : gl.NEAREST,
+      'uint8': gl.UNSIGNED_BYTE,
+      'uint16': gl.UNSIGNED_SHORT,
+      'float32': gl.FLOAT,
+      'rgba' : gl.UNSIGNED_BYTE,
+      'gray' : gl.LUMINANCE,
+      'color': gl.RGBA
+    }
+  
+     
+    this.width = raster.width;
+    this.height = raster.height;
+    
+    let texture = this._createTexture(
+      gl,
+      raster.pixelData,
+      raster.width,
+      raster.height,
+      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
+      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
+      glConstants[raster.type],
+      glConstants[wrap],
+      glConstants[mini],
+      glConstants[mag]
+    );
+    
+
+    this.textures.push({texture: texture, unit: unit});
+    
+    return this;
+  }
+
+  /**
+   *
+   */
+  preprocess() {
+    return this.use();
+  }
+  
+  /**
+   *
+   */
+  process() {
+    return this.run();
+  }
+  
+  /**
+   *
+   */
+  use() {
+    let gl = this.context;
+    
+    gl.useProgram(this.shader.program);
+    
+    return this;
+  }
+  
+  /**
+   *
+   */
+  run() {
+    let gl = this.context;
+    
+    // Bind the position buffer containing the vertices (ie rectangle)
+    gl.bindVertexArray(this.vao);
+
+    this.textures.forEach( (tex) => {
+      gl.activeTexture(gl.TEXTURE0 + tex.unit);
+      gl.bindTexture(gl.TEXTURE_2D, tex.texture);
+    });
+
+    gl.drawArrays(this.geometries.glType,0,this.geometries.numVertices);
+    
+    // Clean up
+    // TODO
+    gl.bindTexture(gl.TEXTURE_2D,null);
+    gl.bindFramebuffer(gl.DRAW_FRAMEBUFFER,null);
+    
+    return this;
+  }
+
+
+  /**
+   *
+   */
+  uniform(u_name,u_value) {
+    let gl = this.context;
+    
+    let u = this.shader.uniforms[u_name];
+
+    switch (u.type) {
+      case 'float': gl.uniform1f(u.location, u_value);break;
+      case 'int': gl.uniform1i(u.location, u_value);break;
+      case 'uint': gl.uniform1ui(u.location, u_value);break;
+      case 'int[]': gl.uniform1iv(u.location, u_value);break;
+      case 'float[]': gl.uniform1fv(u.location, u_value);break;
+      case 'mat2': gl.uniformMatrix2fv(u.location, u_value);break;
+      case 'mat3': gl.uniformMatrix3fv(u.location, u_value);break;
+      case 'mat4': gl.uniformMatrix4fv(u.location, u_value);break;
+      case 'sampler2D': gl.uniform1i(u.location, u_value);break;
+      case 'vec2': gl.uniform2fv(u.location, u_value);break;
+      case 'vec3': gl.uniform3fv(u.location, u_value);break;
+      case 'vec4': gl.uniform4fv(u.location, u_value);break;
+    };
+    return this;
+   }
+   
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Processor;
+
+
+
+
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return fill; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+
+/**
+ * @module math
+ */
+ 
+
+  
+/**
+  * Fill with values calculated from a function
+  *
+  * @param {function} func - A function
+  * <p>The function may take a maximum of nine arguments:</p>
+  * <ul>
+  * <li>pix - Pixel value</li>
+  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+  * <li>x - X-coordinate of pix</li>
+  * <li>y - Y-coordinate of pix</li>
+  * <li>z - Z-coordinate of pix if raster is in 3D</li>
+  * <li>w - Width of raster</li>
+  * <li>h - Height of raster</li>
+  * <li>a - Angle calculated as atan2(y/x)</li>
+  * <li>d - Distance to the center</li>
+  * </ul>
+  * @example <caption>Fill with a spiral</caption>
+  * const DEG = Math.PI / 180;
+  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+  * let raster = T.fill(spiral)(img.getRaster() );
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const fill = (func) => (raster,copy_mode=true) => {
+  let src_vs = `#version 300 es
+
+  in vec2 a_vertex;
+  
+  void main() {
+    gl_Position = vec4(a_vertex * 2.0 - 1.0, 0.0, 1.0);
+  }`;
+
+  /*
+    Private function
+   */
+  function parse(src) {
+    
+    // Parse
+    // 1- Search the arguments between parentheses `(..)`
+    let re = /\(([^)]+)\)/g;
+    let args = re.exec(src)[1].split(',');
+    if (args.length !== 9) {
+      const default_args = ['pix','index','x','y','z','rasterWidth','rasterHeight','angle','distance'];
+      args = [...args,...default_args.slice(args.length,default_args.length) ];
+    }
+    // 2- Search the core between curly brackets {..}` or between arrow `=>` and semi-column `;` or EOL
+    //=> { }
+    let func_body = '';
+    if (/\{(.*)\}/g.exec(src) === undefined) {
+      func_body = /\{(.*)\}/g.exec(src)[1];
+    }
+    else {
+      func_body = /=>(.*)$/g.exec(src)[1];
+    }
+    // 2- Clean code like removing `Math.`, changed variable names, etc.
+    // Python replace(/(?<![\d.])[0-9]+(?![\d.])/,'$1.0');
+    func_body = func_body.replace(/Math\./g,'').replace(/cpu\./g,'').replace(/([\d.]+)/g,'$1.0').replace(/(\.\d+).0/g,'$1');
+    
+    // Build the code
+    let func_code = `vec4 fill(float ${args[0]}) {
+        float ${args[2]} = gl_FragCoord.x; 
+        float ${args[3]} = gl_FragCoord.y;
+        // float ${args[4]} = gl_FragCoord.z;
+        float ${args[5]} = u_rasterSize.x;
+        float ${args[6]} = u_rasterSize.y;
+        int ${args[1]} = int(${args[2]} + ${args[5]} * ${args[3]});
+        float halfw = ${args[5]} / 2.0;
+        float halfh = ${args[6]} / 2.0;
+        vec2 point = vec2((${args[2]} - halfw), (${args[3]} - halfh));
+        float ${args[8]} = sqrt( dot(point,point) );
+        float ${args[7]} = atan(${args[3]}/${args[2]});
+        float value = ${func_body};
+        return vec4(vec3(value / 255.0),1.0);
+      }`; 
+    // 2- if pixel used, define a sampler...
+
+    let template = `#version 300 es
+      precision highp float;
+      
+      // we need to declare an output for the fragment shader
+      out vec4 outColor;
+      uniform vec2 u_rasterSize;
+
+      ${func_code}
+      
+      void main() {
+        outColor = vec4(fill(0.0)); 
+      }`;
+    
+    // DEBUG - 
+    console.log(template);
+    
+    return template;
+  } 
+  
+  // Step #2: Parse `func` to create fragment source
+  let src_fs = parse(func.toString());
+
+  // Step #2: Create - compile + link - shader program
+  let the_shader = gpu.createProgram(gpuEnv,src_vs,src_fs);
+  
+  // Step #3: Create the rectangle WITHOUT texture 
+  let gproc = gpu.createGPU(gpuEnv,raster.width,raster.height)
+    .geometry({
+      type: 'TRIANGLE_STRIP',
+      num: 4,
+      vertices: new Float32Array([
+        0.0,0.0,
+        0.0,1.0,
+        1.0,0.0,
+        1.0,1.0,
+        ])
+    })
+    .attribute('a_vertex',2,'float', 2 * 4,0)
+    .packWith(the_shader) 
+    .clearCanvas([0.0,1.0,1.0,1.0])
+    .preprocess()
+    .uniform('u_rasterSize',new Float32Array([raster.width,raster.height]) )
+    .run();
+    
+  return raster;
+};
+  
+
+/**
+  * Fill with values calculated from a function
+  *
+  * @param {function} func - A function
+  * <p>The function may take a maximum of nine arguments:</p>
+  * <ul>
+  * <li>pix - Pixel value</li>
+  * <li>index - Index corresponding to pix. A raster is a 1D pixels array</li>
+  * <li>x - X-coordinate of pix</li>
+  * <li>y - Y-coordinate of pix</li>
+  * <li>z - Z-coordinate of pix if raster is in 3D</li>
+  * <li>w - Width of raster</li>
+  * <li>h - Height of raster</li>
+  * <li>a - Angle calculated as atan2(y/x)</li>
+  * <li>d - Distance to the center</li>
+  * </ul>
+  * @example <caption>Fill with a spiral</caption>
+  * const DEG = Math.PI / 180;
+  * const spiral = (pix,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10+ a * DEG)+1);
+  * let raster = T.fill(spiral)(img.getRaster() );
+  * @param {Raster} raster - Input Raster
+  * @param {boolean} copy_mode - Useless, here. Only for compatibility with other process functions
+  *
+  * @author Jean-Christophe Taveau
+  */
+const math = (func) => (raster,copy_mode=true) => {
+  // TODO
+  // cpu.fill(func)(T.Raster.from(raster,copy_mode),copy_mode);
+};
+
+/**
+ * Image Calculator. Combine two images by operation
+ *
+ * @param {Raster} raster - Input Raster
+ * @param {function} func - Function for computation
+ * @param {Raster} raster - Input Raster
+ * @param {boolean} copy_mode - Copy mode to manage memory usage.
+ * @example <caption>Addition of two uint8 rasters with clamping</caption>
+ * let raster3 = T.calc(raster1, (px1,px2) => T.clampUint8(px1 + px2) )(raster2)
+ *
+ * @author Jean-Christophe Taveau
+ */
+const calc = (other,func) => (raster,copy_mode=true) => {
+  // TODO Assume two raster have same dimension
+
+  return output;
+};
+
+// Export
+
 
 
 
