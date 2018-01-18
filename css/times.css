@@ -1,4 +1,4 @@
-.twindow {
+.twindow,.gpu_window {
   background-color: #efefef;
   border: 2px solid black;
   border-radius: 10px 10px 0 10px;
@@ -25,6 +25,18 @@
   /*font-family: 'Walter Turncoat', cursive;*/
 }
 
+.gpu_window header {
+  background-color:#ff2222 ;
+  margin: 0px;
+  padding: 5px 10px 5px 10px ;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  -moz-border-top-left-radius: 10px;
+  -moz-border-top-right-radius: 10px;
+  color: #FFFFFF;
+  /*font-family: 'Walter Turncoat', cursive;*/
+}
+
 .twindow header:hover {
   background-color: #333334;
   cursor: move;
@@ -38,6 +50,9 @@
 }
 
 .twindow canvas {
+  background-image: url("../css/background.png");
+}
+.gpu_window canvas {
   background-image: url("../css/background.png");
 }
 
