@@ -29,6 +29,9 @@ import {createGPU,createProgram,getGraphicsContext} from './gpu_utils';
 /* gpu/Processor*/
 import {Processor} from './Processor';
 
+/* gpu/color*/
+import {invert} from './gpu_color';
+
 /* gpu/math*/
 import {fill} from './gpu_math';
 
@@ -36,6 +39,7 @@ import {fill} from './gpu_math';
 export {
   createGPU,createProgram,getGraphicsContext,
   Processor,
+  invert,
   fill
 };
 

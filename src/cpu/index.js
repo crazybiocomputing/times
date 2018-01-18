@@ -24,7 +24,7 @@
  
  
  /* Process/utils */
-import {clamp,clampUint8,pipe} from './process/utils';
+import {clamp,clampUint8,degrees,pipe,radians} from './process/utils';
 
 /* Process/color */
 import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toRGBA} from './process/color';
@@ -53,7 +53,7 @@ import {renderVector} from './render/renderVector';
 
 
 export {
-  clamp,clampUint8,pipe,
+  clamp,clampUint8,degrees,pipe,radians,
   red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
   splitChannels,toRGBA,
   crop,

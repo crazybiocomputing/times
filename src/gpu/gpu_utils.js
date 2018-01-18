@@ -43,21 +43,28 @@ const createGPU = (graphics,width=-1,height=-1) => new gpu.Processor(graphics.co
  *
  */
 const getGraphicsContext = (elementID='preview') => {
+  // http://webglreport.com/
   let _canvas = document.getElementById(elementID);
   let gl2;
+  let _params = {};
+  
   try {
     gl2 = _canvas.getContext("webgl2");
-    
+    // Need extension(s)
     const ext = gl2.getExtension("EXT_color_buffer_float");
     if (!ext) {
       alert("need EXT_color_buffer_float");
     }
+    // Various useful configuration parameters
+    _params.maxTextures  = gl2.getParameter(gl2.MAX_TEXTURE_IMAGE_UNITS);
+    _params.maxTextureSize  = gl2.getParameter(gl2.MAX_TEXTURE_SIZE);
+    
   } catch (e) {
   }
   if (!gl2) {
       alert("Could not initialise WebGL2, sorry :-(");
   }
-  return {canvas: _canvas, context: gl2};
+  return {canvas: _canvas, context: gl2, parameters: _params};
 };
 
 
