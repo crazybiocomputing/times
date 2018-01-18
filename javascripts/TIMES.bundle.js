@@ -7,7 +7,7 @@
 		var a = factory();
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function() {
+})(typeof self !== 'undefined' ? self : this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -2777,12 +2777,14 @@ const renderVector = (win) => (obj,copy=true) => {
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_utils__ = __webpack_require__(22);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Processor__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gpu_math__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gpu_color__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_math__ = __webpack_require__(25);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createGPU", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createProgram", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "getGraphicsContext", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["c"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Processor", function() { return __WEBPACK_IMPORTED_MODULE_1__Processor__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_2__gpu_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "invert", function() { return __WEBPACK_IMPORTED_MODULE_2__gpu_color__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_3__gpu_math__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -2812,6 +2814,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* gpu/Processor*/
+
+
+/* gpu/color*/
 
 
 /* gpu/math*/
@@ -2877,21 +2882,28 @@ const createGPU = (graphics,width=-1,height=-1) => new gpu.Processor(graphics.co
  *
  */
 const getGraphicsContext = (elementID='preview') => {
+  // http://webglreport.com/
   let _canvas = document.getElementById(elementID);
   let gl2;
+  let _params = {};
+  
   try {
     gl2 = _canvas.getContext("webgl2");
-    
+    // Need extension(s)
     const ext = gl2.getExtension("EXT_color_buffer_float");
     if (!ext) {
       alert("need EXT_color_buffer_float");
     }
+    // Various useful configuration parameters
+    _params.maxTextures  = gl2.getParameter(gl2.MAX_TEXTURE_IMAGE_UNITS);
+    _params.maxTextureSize  = gl2.getParameter(gl2.MAX_TEXTURE_SIZE);
+    
   } catch (e) {
   }
   if (!gl2) {
       alert("Could not initialise WebGL2, sorry :-(");
   }
-  return {canvas: _canvas, context: gl2};
+  return {canvas: _canvas, context: gl2, parameters: _params};
 };
 
 
@@ -3247,18 +3259,26 @@ class Processor {
   };
 
   /**
- *
- */
+   * Create and set up several textures
+   *
+   * @param {[Object]} array - Array of texture object. The pixel data must be stored as a Raster
+   */
+  textures(array) {
+    array.forEach( (tex) => this.texture(tex.raster,tex.unit,tex.wrap,tex.mini,tex.mag));
+    return this;
+  }
+  
+  /**
+   * Create and set up a texture
+   *
+   */
   texture(raster,unit=0, wrap='clamp',mini='nearest', mag= 'nearest') {
   
-    console.log('RASTER ? ...');
     if (raster.id !== undefined && raster.id === 'framebuffer') {
-      console.log('No, FBO...');
+      console.log('This is a FBO...');
       this.textures[0] = {texture: raster.texture, unit: unit};
       return this;
     }
-    console.log('Yes, Raster!');
-    console.log(raster);
     
     let gl = this.context;
     
@@ -3383,6 +3403,115 @@ class Processor {
 
 /***/ }),
 /* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return invert; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+ 
+'use script';
+
+/**
+ * Invert colors
+ *
+ * @author Jean-Christophe Taveau
+ */
+ 
+const invert = (raster,graphContext, copy_mode = true) => {
+
+  let id='invert';
+  
+  let src_vs = `#version 300 es
+
+  in vec2 a_vertex;
+  in vec2 a_texCoord;
+  
+  uniform vec2 u_resolution;
+  
+  out vec2 v_texCoord;
+  
+  void main() {
+    v_texCoord = a_texCoord;
+    vec2 clipSpace = a_vertex * u_resolution * 2.0 - 1.0;
+    gl_Position = vec4( clipSpace * vec2(1,-1), 0.0, 1.0);
+  }`;
+
+  let src_fs = `#version 300 es
+  precision mediump float;
+  
+  in vec2 v_texCoord;
+  uniform sampler2D u_image;
+
+  out vec4 outColor;
+  
+  void main() {
+    outColor = vec4(1.0 - texture(u_image, v_texCoord).rgb, 1.0); 
+  }`;
+  
+
+  // Step #1: Create - compile + link - shader program
+  let the_shader = gpu.createProgram(graphContext,src_vs,src_fs);
+
+  console.log('programs done...');
+    
+  // Step #2: Create a gpu.Processor, and define geometry, attributes, texture, VAO, .., and run
+  let gproc = gpu.createGPU(graphContext)
+    .size(raster.width,raster.height)
+    .geometry({
+      type: 'TRIANGLE_STRIP',
+      num: 4,
+      vertices: new Float32Array(
+        [
+          0.0,0.0,0.0,0.0,
+          0.0,raster.height,0.0,1.0,
+          raster.width,0.0,1.0,0.0,
+          raster.width,raster.height,1.0,1.0
+        ]
+      )
+    })
+    .attribute('a_vertex',2,'float', 16,0)      // X, Y
+    .attribute('a_texCoord',2, 'float', 16, 8)  // S, T
+    .texture(raster,0)
+    .packWith(the_shader) // VAO
+    .clearCanvas([0.0,1.0,1.0,1.0])
+    .preprocess()
+    .uniform('u_resolution',new Float32Array([1.0/raster.width,1.0/raster.height]))
+    .uniform('u_image',0)
+    .run();
+
+  return raster;
+}
+
+
+
+
+
+
+
+/***/ }),
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
