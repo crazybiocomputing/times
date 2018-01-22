@@ -207,6 +207,19 @@ export class Processor {
   _createTexture (context,data,w,h,iformat,format,type, wrap,mini, mag) {
     let gl = context;
     
+    // Define a PBO for texture data?
+    // https://stackoverflow.com/questions/43530082/how-can-i-upload-a-texture-in-webgl2-using-a-pixel-buffer-objecthttps://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
+    // https://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
+    // const pbo = gl.createBuffer();
+    // const data = ctx.getImageData(0, 0, 300, 150).data; 
+    // gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo);
+    // gl.bufferData(gl.PIXEL_UNPACK_BUFFER, data, gl.STATIC_DRAW);
+    // data is now in PBO
+    // const tex = gl.createTexture();
+    // gl.bindTexture(gl.TEXTURE_2D, tex);
+    // take data from PBO
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 300, 150, 0, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    
     let texture = gl.createTexture();
 
     // Bind it to texture unit 0' 2D bind point
@@ -243,18 +256,26 @@ export class Processor {
   };
 
   /**
- *
- */
+   * Create and set up several textures
+   *
+   * @param {[Object]} array - Array of texture object. The pixel data must be stored as a Raster
+   */
+  textures(array) {
+    array.forEach( (tex) => this.texture(tex.raster,tex.unit,tex.wrap,tex.mini,tex.mag));
+    return this;
+  }
+  
+  /**
+   * Create and set up a texture
+   *
+   */
   texture(raster,unit=0, wrap='clamp',mini='nearest', mag= 'nearest') {
   
-    console.log('RASTER ? ...');
     if (raster.id !== undefined && raster.id === 'framebuffer') {
-      console.log('No, FBO...');
+      console.log('This is a FBO...');
       this.textures[0] = {texture: raster.texture, unit: unit};
       return this;
     }
-    console.log('Yes, Raster!');
-    console.log(raster);
     
     let gl = this.context;
     
@@ -294,31 +315,44 @@ export class Processor {
     return this;
   }
 
-  /**
+  /** 
+   * Configure the rendering/computing engine before run(..)
    *
+   * @author Jean-Christophe Taveau
    */
-  preprocess() {
-    return this.use();
-  }
-  
-  /**
-   *
-   */
-  process() {
-    return this.run();
-  }
-  
-  /**
-   *
-   */
-  use() {
+  preprocess(options) {
     let gl = this.context;
     
+    // Activate shader program
     gl.useProgram(this.shader.program);
+    
+    // Add various rendering parameters
+    
+    // Blending operations 
+    // TODO
+    // gl.enable(gl.BLEND);
     
     return this;
   }
   
+  /**
+   *
+   */
+  postprocess() {
+    // Clean ?
+    
+    return this;
+  }
+  
+
+/**
+ * 
+ */
+ readPixels() {
+  // http://roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
+ }
+ 
+ 
   /**
    *
    */
@@ -343,7 +377,7 @@ export class Processor {
     return this;
   }
 
-
+ 
   /**
    *
    */

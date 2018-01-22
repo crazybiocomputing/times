@@ -32,11 +32,15 @@ import * as io from './io/loadImage';
 /* cpu/ */
 import * as cpu from './cpu/index.js';
 
+/* gpu/ */
+import * as gpu from './gpu/index.js';
+
 
 export {
   T,
   io,
-  cpu
+  cpu,
+  gpu
 };
 
 

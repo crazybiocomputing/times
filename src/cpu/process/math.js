@@ -68,7 +68,7 @@ const ramp = (px,i,x,y,z,w,h) => x / w * 255;
   *
   * @author Jean-Christophe Taveau
   */
-const spiral = (px,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10 + a * DEG)+1);
+const spiral = (px,i,x,y,z,w,h,a,d) => 128 * (Math.sin(d / 10 + cpu.radians(a))+1);
 
 /**
   * Pattern `black`. Must be used with T.fill(..)

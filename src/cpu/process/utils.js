@@ -59,6 +59,23 @@ const clampUint8 = clamp(0,255);
 const clampUint16 = clamp(0,65535);
 
 /**
+ * Convert radians to degrees
+ *
+ * @author Jean-Christophe Taveau
+ */
+const degrees = (radian_angle) => radian_angle * 180.0 / Math.PI;
+
+
+/**
+ * Convert degrees to radians
+ *
+ * @author Jean-Christophe Taveau
+ */
+const radians = (degree_angle) => degree_angle * Math.PI / 180.0;
+
+
+
+/**
  * Check Endianness
  *
  * @author Jean-Christophe Taveau
@@ -155,7 +172,23 @@ const histogram = (binNumber) => (raster, copy_mode = true) => {
   return raster;
 };
 
+/**
+ * Get index
+ */
+const getIndex = (x,y,width) => x + y * width;
+
+/**
+ *
+ */
+const getX = (index,width) => index % width;
+
+/**
+ *
+ */
+const getY = (index,width) => Math.floor(index / width);
+
+
 
 // Exports
-export {clamp,clampUint8,histogram,isLittleEndian,pipe,statistics};
+export {clamp,clampUint8,degrees,getX, getY, histogram,getIndex,isLittleEndian,pipe,radians,statistics};
 

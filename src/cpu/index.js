@@ -24,13 +24,19 @@
  
  
  /* Process/utils */
-import {clamp,clampUint8,degrees,pipe,radians} from './process/utils';
+import {clamp,clampUint8,degrees,getX, getY, getIndex, pipe,radians} from './process/utils';
 
 /* Process/color */
 import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toRGBA} from './process/color';
 
 /* Process/geometry */
 import {crop} from './process/geometry';
+
+/* Process/filters */
+import {CPU_HARDWARE,GPU_HARDWARE,
+  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,
+  BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
+  convolve,convolutionKernel,mean,meanKernel} from './process/filters';
 
 /* Process/math */
 import {black,calc,chessboard,fillColor,fill,math,ramp,spiral,white} from './process/math';
@@ -53,10 +59,14 @@ import {renderVector} from './render/renderVector';
 
 
 export {
-  clamp,clampUint8,degrees,pipe,radians,
+  clamp,clampUint8,degrees,getX, getY, getIndex,pipe,radians,
   red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
   splitChannels,toRGBA,
   crop,
+  CPU_HARDWARE,GPU_HARDWARE,
+  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,
+  BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
+  convolve,convolutionKernel,mean,meanKernel,
   black,calc,chessboard,fillColor,fill,math,ramp,spiral,white,
   noise,saltAndPepper,
   histogram,statistics,
