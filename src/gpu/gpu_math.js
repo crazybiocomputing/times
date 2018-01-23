@@ -137,7 +137,7 @@ const fill = (func) => (raster,copy_mode=true) => {
   // Step #3: Create the rectangle WITHOUT texture 
   let gproc = gpu.createGPU(gpuEnv,raster.width,raster.height)
     .geometry({
-      type: 'TRIANGLE_STRIP',
+      type: gpu.TRIANGLE_STRIP,
       num: 4,
       vertices: new Float32Array([
         0.0,0.0,

@@ -2170,9 +2170,9 @@ const convolutionKernel = (hardware, type, width, height_or_radius, weights, nor
  *
  * @author Jean-Christophe Taveau
  */
-const meanKernel = (hardware, type, size, normalize = true) => {
+const meanKernel = (hardware, type, width, height_or_radius, normalize = true) => {
   // Precalculate weights and offsets
-  let kernel = getKernelOffsets(hardware, type, size, size);
+  let kernel = getKernelOffsets(hardware, type, width, height_or_radius, weights);
   // Compute the sum of kernel weight for normalization
   let sum = kernel.reduce ( (sum,v) => sum + v, 0);
   
@@ -2200,26 +2200,30 @@ const gaussBlurKernel = (hardware, type, size, normalize = true) => {
  * @author Jean-Christophe Taveau
  */
 const convolve = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
-  // Manage clamp to border
+  // Manage clamp to border - outside: 0
   const clampBorder = (pixels,x,y,width,height) => {
     return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
   };
   
+  // Manage clamp to edge - outside: value of the image edge
   const clampEdge = (pixels, x,y,width,height) => {
     let xx = Math.min(Math.max(x,0),width  - 1);
     let yy = Math.min(Math.max(y,0),height - 1);
     return pixels[xx + yy * width];
   };
   
+  // Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
   const repeat = (pixels, x,y,width,height) => {
     let xx = (width  + x ) % width;
     let yy = (height + y ) % height;
     return pixels[xx + yy * width];
   };
   
+  // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
+  // BUG
   const mirror = (pixels, x,y, width,height) => {
-    let xx = ( 2 * (width  - 1)  - x ) % (width - 1);
-    let yy = ( 2 * (height - 1)  - y ) % (height - 1);
+    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
+    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
     return pixels[xx + yy * width];
   };
   
@@ -2241,6 +2245,28 @@ const convolve = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=tru
       return sum;
     },0.0);
   });
+  return output;
+}
+
+
+/**
+ * Convolve operation using separable kernels
+ *
+ * @param {array[number]} kernel1 - Convolution mask for first pass
+ * @param {array[number]} kernel2 - Convolution mask for second pass
+ * @param {number} wrap - Wrap mode for managing the raster border
+ * @param {TRaster} img - Input image to process
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Filtered Image
+ *
+ * @author Jean-Christophe Taveau
+ */
+const convolveSeparable = (kernel1, kernel2, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
+  let output =  TRaster.from(img,copy);
+  // TODO
+  // First pass
+  // Second pass
+  
   return output;
 }
 
@@ -3057,16 +3083,57 @@ const renderVector = (win) => (obj,copy=true) => {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_utils__ = __webpack_require__(23);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Processor__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__gpu_color__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_math__ = __webpack_require__(26);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createGPU", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createProgram", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "getGraphicsContext", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_utils__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Processor", function() { return __WEBPACK_IMPORTED_MODULE_1__Processor__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "invert", function() { return __WEBPACK_IMPORTED_MODULE_2__gpu_color__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_3__gpu_math__["a"]; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewport", function() { return viewport; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_constants__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gpu_utils__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Processor__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_color__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gpu_math__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gpu_preprocess__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gpu_statistics__ = __webpack_require__(29);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "POINTS", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["z"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINES", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["k"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINE_LOOP", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINE_STRIP", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["m"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TRIANGLES", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["E"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TRIANGLE_STRIP", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["G"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "TRIANGLE_FAN", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["F"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "NEAREST", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["r"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINEAR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "REPEAT", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["A"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CLAMP_TO_EDGE", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MIRRORED_REPEAT", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["q"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CLAMP", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MIRROR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["p"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FUNC_ADD", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FUNC_SUBSTRACT", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "FUNC_REVERSE_SUBTRACT", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MIN", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["o"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "MAX", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["n"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ZERO", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["H"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["s"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SRC_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["D"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_SRC_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["y"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SRC_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["B"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_SRC_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["x"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DST_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_DST_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["v"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "DST_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_DST_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["w"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "SRC_ALPHA_SATURATE", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["C"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CONSTANT_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_CONSTANT_COLOR", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["u"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CONSTANT_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ONE_MINUS_CONSTANT_ALPHA", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["t"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createGPU", function() { return __WEBPACK_IMPORTED_MODULE_1__gpu_utils__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createProgram", function() { return __WEBPACK_IMPORTED_MODULE_1__gpu_utils__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "getGraphicsContext", function() { return __WEBPACK_IMPORTED_MODULE_1__gpu_utils__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "rectangle", function() { return __WEBPACK_IMPORTED_MODULE_1__gpu_utils__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Processor", function() { return __WEBPACK_IMPORTED_MODULE_2__Processor__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "invert", function() { return __WEBPACK_IMPORTED_MODULE_3__gpu_color__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_4__gpu_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "blend", function() { return __WEBPACK_IMPORTED_MODULE_5__gpu_preprocess__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "histogram", function() { return __WEBPACK_IMPORTED_MODULE_6__gpu_statistics__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -3092,6 +3159,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
  */
  
 
+/* gpu/gpu_constants */
+
+
 /* gpu/gpu_utils */
 
 
@@ -3102,6 +3172,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* gpu/math*/
+
+
+/* gpu/preprocess*/
+
+
+/* gpu/statistics*/
 
 
 
@@ -3115,10 +3191,289 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+// From MDN
+// https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants
+
+/**
+ * Passed to drawElements or drawArrays to draw single points.
+ */
+const POINTS  = 0x0000;
+/* harmony export (immutable) */ __webpack_exports__["z"] = POINTS;
+ 
+ 
+/**
+ * Passed to drawElements or drawArrays to draw lines. Each vertex connects to the one after it.
+ */
+const LINES  = 0x0001;
+/* harmony export (immutable) */ __webpack_exports__["k"] = LINES;
+
+
+/**
+ * Passed to drawElements or drawArrays to draw lines. Each set of two vertices is treated as a separate line segment.
+ */
+const LINE_LOOP = 0x0002;
+/* harmony export (immutable) */ __webpack_exports__["l"] = LINE_LOOP;
+
+
+/**
+ * Passed to drawElements or drawArrays to draw a connected group of line segments from the first vertex to the last.
+ */
+const LINE_STRIP = 0x0003;
+/* harmony export (immutable) */ __webpack_exports__["m"] = LINE_STRIP;
+ 
+
+/**
+ * Passed to drawElements or drawArrays to draw triangles. Each set of three vertices creates a separate triangle.
+ */
+const TRIANGLES = 0x0004;
+/* harmony export (immutable) */ __webpack_exports__["E"] = TRIANGLES;
+
+
+/**
+ * Passed to drawElements or drawArrays to draw a connected group of triangles.
+ */
+const TRIANGLE_STRIP = 0x0005;
+/* harmony export (immutable) */ __webpack_exports__["G"] = TRIANGLE_STRIP;
+
+
+/**
+ * 	Passed to drawElements or drawArrays to draw a connected group of triangles. 
+ * Each vertex connects to the previous and the first vertex in the fan.
+ */
+const TRIANGLE_FAN  = 0x0006;
+/* harmony export (immutable) */ __webpack_exports__["F"] = TRIANGLE_FAN;
+
+
+/**
+ * Texture constant
+ */
+const NEAREST = 0x2600;
+/* harmony export (immutable) */ __webpack_exports__["r"] = NEAREST;
+
+
+/**
+ * Texture constant
+ */
+const LINEAR = 0x2601;
+/* harmony export (immutable) */ __webpack_exports__["j"] = LINEAR;
+
+
+/**
+ * Texture constant
+ */
+const REPEAT = 0x2901;
+/* harmony export (immutable) */ __webpack_exports__["A"] = REPEAT;
+
+
+/**
+ * Texture constant
+ */
+const CLAMP_TO_EDGE = 0x812F;
+/* harmony export (immutable) */ __webpack_exports__["b"] = CLAMP_TO_EDGE;
+
+
+/**
+ * Texture constant
+ */
+const MIRRORED_REPEAT = 0x8370;
+/* harmony export (immutable) */ __webpack_exports__["q"] = MIRRORED_REPEAT;
+
+
+/**
+ * Shorter non official texture constant
+ */
+const CLAMP = CLAMP_TO_EDGE;
+/* harmony export (immutable) */ __webpack_exports__["a"] = CLAMP;
+
+
+/**
+ * Shorter non official texture constant
+ */
+const MIRROR = MIRRORED_REPEAT;
+/* harmony export (immutable) */ __webpack_exports__["p"] = MIRROR;
+
+
+/**
+ * Passed to blendEquation or blendEquationSeparate to set an addition blend function. 
+ * Op = source + destination,
+ */
+const FUNC_ADD = 0x8006;
+/* harmony export (immutable) */ __webpack_exports__["g"] = FUNC_ADD;
+
+
+/**
+ * Passed to blendEquation or blendEquationSeparate to specify a subtraction blend function
+ * Op = (source - destination).
+ */
+const FUNC_SUBSTRACT = 0x800A;
+/* harmony export (immutable) */ __webpack_exports__["i"] = FUNC_SUBSTRACT;
+
+
+/**
+ * Passed to blendEquation or blendEquationSeparate to specify a reverse subtraction blend function 
+ * Op =(destination - source).
+ */
+const FUNC_REVERSE_SUBTRACT = 0x800B;
+/* harmony export (immutable) */ __webpack_exports__["h"] = FUNC_REVERSE_SUBTRACT;
+
+
+/**
+ * Produces the minimum color components of the source and destination colors.
+ */
+const MIN = 0x8007;
+/* harmony export (immutable) */ __webpack_exports__["o"] = MIN;
+
+
+/**
+ * Produces the maximum color components of the source and destination colors.
+ */
+const MAX = 0x8008;
+/* harmony export (immutable) */ __webpack_exports__["n"] = MAX;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to turn off a component.
+ */
+const ZERO = 0;
+/* harmony export (immutable) */ __webpack_exports__["H"] = ZERO;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to turn on a component.
+ */
+const ONE = 1;
+/* harmony export (immutable) */ __webpack_exports__["s"] = ONE;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by the source elements color.
+ */
+const SRC_COLOR = 0x0300;
+/* harmony export (immutable) */ __webpack_exports__["D"] = SRC_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by one minus the source elements color.
+ */
+const ONE_MINUS_SRC_COLOR = 0x0301;
+/* harmony export (immutable) */ __webpack_exports__["y"] = ONE_MINUS_SRC_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by the source's alpha.
+ */
+const SRC_ALPHA = 0x0302;
+/* harmony export (immutable) */ __webpack_exports__["B"] = SRC_ALPHA;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by one minus the source's alpha.
+ */
+const ONE_MINUS_SRC_ALPHA = 0x0303;
+/* harmony export (immutable) */ __webpack_exports__["x"] = ONE_MINUS_SRC_ALPHA;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by the destination's alpha.
+ */
+const DST_ALPHA = 0x0304;
+/* harmony export (immutable) */ __webpack_exports__["e"] = DST_ALPHA;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by one minus the destination's alpha.
+ */
+const ONE_MINUS_DST_ALPHA = 0x0305;
+/* harmony export (immutable) */ __webpack_exports__["v"] = ONE_MINUS_DST_ALPHA;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by the destination's color.
+ */
+const DST_COLOR = 0x0306;
+/* harmony export (immutable) */ __webpack_exports__["f"] = DST_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by one minus the destination's color.
+ */
+const ONE_MINUS_DST_COLOR = 0x0307;
+/* harmony export (immutable) */ __webpack_exports__["w"] = ONE_MINUS_DST_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to multiply a component by the minimum of source's alpha or one minus the destination's alpha.
+ */
+const SRC_ALPHA_SATURATE = 0x0308
+/* harmony export (immutable) */ __webpack_exports__["C"] = SRC_ALPHA_SATURATE;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to specify a constant color blend function.
+ */
+const CONSTANT_COLOR = 0x8001;
+/* harmony export (immutable) */ __webpack_exports__["d"] = CONSTANT_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to specify one minus a constant color blend function.
+ */
+const ONE_MINUS_CONSTANT_COLOR = 0x8002;
+/* harmony export (immutable) */ __webpack_exports__["u"] = ONE_MINUS_CONSTANT_COLOR;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to specify a constant alpha blend function.
+ */
+const CONSTANT_ALPHA = 0x8003;
+/* harmony export (immutable) */ __webpack_exports__["c"] = CONSTANT_ALPHA;
+
+
+/**
+ * Passed to blendFunc or blendFuncSeparate to specify one minus a constant alpha blend function.
+ */
+const ONE_MINUS_CONSTANT_ALPHA = 0x8004;
+/* harmony export (immutable) */ __webpack_exports__["t"] = ONE_MINUS_CONSTANT_ALPHA;
+
+
+
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return createGPU; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return getGraphicsContext; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return createProgram; });
-/* unused harmony export rectangle */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return rectangle; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -3273,7 +3628,7 @@ const createProgram = (gpuEnv,src_vs,src_fs) => {
  */
 
 const rectangle = (w,h) => ({
-    type: 'TRIANGLE_STRIP', 
+    type: gpu.TRIANGLE_STRIP, 
     num: 4,
     vertices: new Float32Array(
       [
@@ -3292,7 +3647,7 @@ const rectangle = (w,h) => ({
 
 
 /***/ }),
-/* 24 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3353,8 +3708,7 @@ class Processor {
   clearCanvas(color = [0.1,0.1,0.1,1.0]) {
     let gl = this.context;
     
-    // Define viewport
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    // clear color
     gl.clearColor(color[0],color[1],color[2],color[3]);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
@@ -3369,13 +3723,10 @@ class Processor {
    */
   geometry(obj) {
     let gl = this.context;
-    const glConstants = {
-      'TRIANGLE_STRIP' : gl.TRIANGLE_STRIP
-    };
     
     // Create vertices for rectangle
     this.geometries.type = obj.type;
-    this.geometries.glType = glConstants[obj.type];
+    this.geometries.glType = obj.type;
     this.geometries.buffer = gl.createBuffer();
     this.geometries.numVertices = obj.num;
     gl.bindBuffer(gl.ARRAY_BUFFER,this.geometries.buffer);
@@ -3440,18 +3791,15 @@ class Processor {
     if (this.framebuffers[fbo_name] === undefined) {
       console.log('CREATE FBO');
       let fbo = gl.createFramebuffer();
-
-      let internalFormat = gl.RGBA;
-      let srcType = gl.UNSIGNED_BYTE;
       
-      if (type == 'uint16' || type === 'float32') {
-        internalFormat = gl.RGBA32F;
-        srcType = gl.FLOAT; 
-      }
+      let [internalFormat, srcType, data] = (type == 'uint16' || type === 'float32') ? 
+        [gl.RGBA32F,gl.FLOAT, new Float32Array(this.width * this.height * 4)] : 
+        [gl.RGBA,gl.UNSIGNED_BYTE, new Uint8ClampedArray(this.width * this.height * 4)];
+
 
       let texture = this._createTexture(
         gl,
-        null,
+        data,
         this.width,
         this.height,
         internalFormat,
@@ -3475,7 +3823,9 @@ class Processor {
         id: 'framebuffer',
         name: fbo_name,
         buffer: fbo,
-        texture: texture
+        texture: texture,
+        format: internalFormat,
+        srcType: srcType
       };
     }
     else {
@@ -3483,7 +3833,7 @@ class Processor {
     }
     
     gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[fbo_name].texture);
-    gl.viewport(0,0,this.width, this.height);
+
     
     return this;
   }
@@ -3505,6 +3855,22 @@ class Processor {
   _createTexture (context,data,w,h,iformat,format,type, wrap,mini, mag) {
     let gl = context;
     
+    // Define a PBO for texture data?
+    // https://stackoverflow.com/questions/43530082/how-can-i-upload-a-texture-in-webgl2-using-a-pixel-buffer-objecthttps://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
+    // https://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
+
+    // const tex = gl.createTexture();
+    // gl.bindTexture(gl.TEXTURE_2D, tex);
+    // take data from PBO
+    // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 300, 150, 0, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    
+    // Create a Pixel Buffer Object (PBO) for fast access to pixel data
+    const pbo = gl.createBuffer();
+    gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo);
+    gl.bufferData(gl.PIXEL_UNPACK_BUFFER, data, gl.STATIC_DRAW);
+    // data is now in PBO
+    
+    // Create a texture
     let texture = gl.createTexture();
 
     // Bind it to texture unit 0' 2D bind point
@@ -3531,7 +3897,7 @@ class Processor {
       0, // Border
       srcFormat,
       srcType,
-      data
+      0 // data already in PBO
     );
 
     // Job finished: Unbind texture
@@ -3546,6 +3912,7 @@ class Processor {
    * @param {[Object]} array - Array of texture object. The pixel data must be stored as a Raster
    */
   textures(array) {
+    // TODO
     array.forEach( (tex) => this.texture(tex.raster,tex.unit,tex.wrap,tex.mini,tex.mag));
     return this;
   }
@@ -3554,7 +3921,7 @@ class Processor {
    * Create and set up a texture
    *
    */
-  texture(raster,unit=0, wrap='clamp',mini='nearest', mag= 'nearest') {
+  texture(raster,unit=0, wrap=gpu.CLAMP,mini=gpu.NEAREST, mag= gpu.NEAREST) {
   
     if (raster.id !== undefined && raster.id === 'framebuffer') {
       console.log('This is a FBO...');
@@ -3589,9 +3956,9 @@ class Processor {
       (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
       (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
       glConstants[raster.type],
-      glConstants[wrap],
-      glConstants[mini],
-      glConstants[mag]
+      wrap,
+      mini,
+      mag
     );
     
 
@@ -3600,31 +3967,78 @@ class Processor {
     return this;
   }
 
-  /**
+  /** 
+   * Configure the rendering/computing engine before run(..)
    *
+   * @author Jean-Christophe Taveau
    */
-  preprocess() {
-    return this.use();
-  }
-  
-  /**
-   *
-   */
-  process() {
-    return this.run();
-  }
-  
-  /**
-   *
-   */
-  use() {
+  preprocess(settings=[]) {
     let gl = this.context;
     
+    // console.log(settings);
+    // Add Default viewport
+    if (settings.find( (elt) => (elt.name === 'viewport')) === undefined) {
+      settings.push({name:'viewport', params: [0.0,0.0, this.width, this.height]});
+    } 
+
+    // Add various rendering parameters
+    
+    // Blending operations 
+    // gl.enable(gl.BLEND);
+    // viewport operations 
+    // TODO
+
+    settings.forEach( (s) => {
+      switch (s.name) {
+      case 'blend': 
+        gl.blendEquation(s.params[0]);
+        gl.blendFunc(s.params[1], s.params[2]);
+        gl.enable(gl.BLEND);
+        break;
+      case 'viewport': 
+        gl.viewport(s.params[0],s.params[1],s.params[2],s.params[3]);
+        break;
+      }
+    });
+    
+
+    // Activate shader program
     gl.useProgram(this.shader.program);
     
     return this;
   }
   
+  /**
+   *
+   */
+  postprocess() {
+    // Clean ?
+    // gl.disable(settings)?
+    return this;
+  }
+  
+
+/**
+ * 
+ */
+ readPixels(fbo_name) {
+  let gl = this.context;
+  
+  // http://roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
+  // https://github.com/KhronosGroup/WebGL/blob/master/sdk/tests/conformance2/reading/read-pixels-from-rgb8-into-pbo-bug.html
+  let fbo = this.framebuffers[fbo_name];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.buffer);
+  gl.bindTexture(gl.TEXTURE_2D, fbo.texture);
+
+  // console.log(this.width, this.height);
+  let data = new Float32Array(this.width * this.height * 4); // RGBA
+  gl.readPixels(0, 0, this.width, this.height, gl.RGBA, fbo.srcType, data);
+  
+  return data;
+  
+ }
+ 
+ 
   /**
    *
    */
@@ -3649,7 +4063,7 @@ class Processor {
     return this;
   }
 
-
+ 
   /**
    *
    */
@@ -3684,7 +4098,7 @@ class Processor {
 
 
 /***/ }),
-/* 25 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3761,18 +4175,7 @@ const invert = (raster,graphContext, copy_mode = true) => {
   // Step #2: Create a gpu.Processor, and define geometry, attributes, texture, VAO, .., and run
   let gproc = gpu.createGPU(graphContext)
     .size(raster.width,raster.height)
-    .geometry({
-      type: 'TRIANGLE_STRIP',
-      num: 4,
-      vertices: new Float32Array(
-        [
-          0.0,0.0,0.0,0.0,
-          0.0,raster.height,0.0,1.0,
-          raster.width,0.0,1.0,0.0,
-          raster.width,raster.height,1.0,1.0
-        ]
-      )
-    })
+    .geometry(gpu.rectangle(raster.width,raster.height))
     .attribute('a_vertex',2,'float', 16,0)      // X, Y
     .attribute('a_texCoord',2, 'float', 16, 8)  // S, T
     .texture(raster,0)
@@ -3793,7 +4196,7 @@ const invert = (raster,graphContext, copy_mode = true) => {
 
 
 /***/ }),
-/* 26 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3937,7 +4340,7 @@ const fill = (func) => (raster,copy_mode=true) => {
   // Step #3: Create the rectangle WITHOUT texture 
   let gproc = gpu.createGPU(gpuEnv,raster.width,raster.height)
     .geometry({
-      type: 'TRIANGLE_STRIP',
+      type: gpu.TRIANGLE_STRIP,
       num: 4,
       vertices: new Float32Array([
         0.0,0.0,
@@ -4006,6 +4409,236 @@ const calc = (other,func) => (raster,copy_mode=true) => {
 };
 
 // Export
+
+
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return blend; });
+/* unused harmony export viewport */
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+/**
+ * https://www.khronos.org/opengl/wiki/Blending
+ *
+ * @example
+ *
+ * 
+ * @author Jean-Christophe Taveau
+ */
+const blend = (funcRGBA) => {
+  // TODO
+  const parse = (txt) => {
+    // Get Arguments
+    // parse body
+    // equations: add(s+d), subtract(s-d) reverse_subtract(d-s) ,min(s,d) max(s,d)
+    //factors: constants (0 and 1), alpha, src, dst, constant_color via blendColor?, constant_alpha?
+    // get Blend values
+  };
+  
+  // func(src,dst) => src + dst - blendEquation(FUNC_ADD); blendFunc(ONE,ONE))
+  // func(src,dst) => src - dst - blendEquation(FUNC_SUBTRACT); blendFunc(ONE,ONE))
+  // func(src,dst) => dst - src - blendEquation(FUNC_REVERSE_SUBTRACT); blendFunc(ONE,ONE))
+  // func(src,dst) => src * dst [+ 0 * dst]  - blendEquation(FUNC_ADD); blendFunc(DST_COLOR,ZERO))
+  // func(src,dst) => src * src.a + (1 - src.a) * dst]  - blendEquation(FUNC_ADD); blendFunc(SRC_ALPHA,ONE_MINUS_SRC_ALPHA))
+
+  // Parse one-liner function
+  parse(funcRGBA.toString());
+  
+  return {
+    name: 'blend',
+    params: [gpu.FUNC_ADD,gpu.ONE,gpu.ONE]
+  }
+}
+
+/**
+ *
+ * @author Jean-Christophe Taveau
+ */
+const viewport = (x,y,w,h) => ({name: 'viewport', params: [x,y,w,h]});
+
+
+
+
+
+
+
+/***/ }),
+/* 29 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return histogram; });
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+/**
+ * @module statistics
+ */
+ 
+/**
+ * Computes basic stats: min, max, mean/average and standard deviation of the image.
+ * Algorithm for variance found in <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm">Wikipedia</a>
+ * 
+ * @param {Raster} img - Input raster
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {object} - Returns an object containing min, max, mean, variance
+ *
+ * @author Jean-Christophe Taveau
+ */
+const statistics = (img, copy_mode = true) => {
+  // TODO
+
+  return img;
+};
+
+const histogram = (binNumber) => (raster, copy_mode = true) => {
+  // https://stackoverflow.com/questions/10316708/ios-glsl-is-there-a-way-to-create-an-image-histogram-using-a-glsl-shader
+  // https://www.opengl.org/discussion_boards/showthread.php/151073-copying-from-texture-to-vertex-buffer
+  // texture to vertex buffer ? see http://nullprogram.com/blog/2014/06/29/
+  
+  let src_vs_texture = `#version 300 es
+  
+    in int a_index;
+
+    uniform int maxbin;
+    
+    // Vertex Texture
+    uniform sampler2D u_raster;
+    
+    out float bin;
+    
+    void main() {
+      ivec2 u_size = textureSize(u_raster,0);
+      int x = (a_index % u_size.x);
+      int y = int(a_index / u_size.x);
+      vec2 coords = vec2(x / u_size.x, y / u_size.y);
+      // bin = texture(u_raster, coords) ;
+
+      gl_Position = vec4(coords * 2.0 - 1.0, 0.0, 1.0);
+    }
+  `;
+  // Vertex Shader
+  let src_vs = `#version 300 es
+  
+    in float a_pixel;
+
+    uniform float u_maxbin;
+    
+    out float bin;
+    
+    void main() {
+      bin = (a_pixel + 0.5) / u_maxbin;
+      gl_Position = vec4(bin * 2.0 - 1.0, 0.0, 0.0, 1.0);
+    }
+  `;
+  // Fragment Shader
+  let src_fs = `#version 300 es
+    precision mediump float;
+    
+    const vec3 step = vec3(1.0,0.0,0.0);
+    
+    in float bin;
+    out vec4 outColor;
+    
+    void main(){
+      outColor = vec4(step, 1.0) ;
+    }`;
+  
+  // Step #2: Create - compile + link - shader program
+  let the_shader = gpu.createProgram(gpuEnv,src_vs,src_fs);
+  
+  // Step #3: Create the rectangle WITHOUT texture
+  let maxBin = binNumber; 
+  
+  let gproc = gpu.createGPU(gpuEnv,maxBin,1)
+    .geometry({
+      type: gpu.POINTS,
+      num: raster.width * raster.height,
+      vertices: new Float32Array(raster.pixelData)
+    } )
+    .attribute('a_pixel',1,'float', 4,0)
+    .packWith(the_shader) 
+    .clearCanvas([0.0,0.0,0.0,1.0])
+    .redirectTo('fbo','float32')
+    .preprocess([
+      gpu.blend((src,dst) => src + dst)
+    ])
+    .uniform('u_maxbin',maxBin)
+    .run();
+    
+  let histogramFloat = gproc.readPixels('fbo').filter( (v,i) => ( (i % 4) === 0)  );
+    
+  if (raster.statistics === undefined) {
+    raster.statistics = {
+      min: -1,
+      max: -1,
+      count : raster.pixelData.length,
+      mean : -1,
+      stddev : -1,
+      histogram: histogramFloat
+    };
+  }
+  else {
+    raster.statistics.histogram = histogramFloat;
+  }
+
+  return raster;
+};
+
+// Exports
+
 
 
 

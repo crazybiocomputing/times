@@ -70,18 +70,7 @@ const invert = (raster,graphContext, copy_mode = true) => {
   // Step #2: Create a gpu.Processor, and define geometry, attributes, texture, VAO, .., and run
   let gproc = gpu.createGPU(graphContext)
     .size(raster.width,raster.height)
-    .geometry({
-      type: 'TRIANGLE_STRIP',
-      num: 4,
-      vertices: new Float32Array(
-        [
-          0.0,0.0,0.0,0.0,
-          0.0,raster.height,0.0,1.0,
-          raster.width,0.0,1.0,0.0,
-          raster.width,raster.height,1.0,1.0
-        ]
-      )
-    })
+    .geometry(gpu.rectangle(raster.width,raster.height))
     .attribute('a_vertex',2,'float', 16,0)      // X, Y
     .attribute('a_texCoord',2, 'float', 16, 8)  // S, T
     .texture(raster,0)

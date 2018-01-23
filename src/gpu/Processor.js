@@ -55,8 +55,7 @@ export class Processor {
   clearCanvas(color = [0.1,0.1,0.1,1.0]) {
     let gl = this.context;
     
-    // Define viewport
-    gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+    // clear color
     gl.clearColor(color[0],color[1],color[2],color[3]);
     gl.clear(gl.COLOR_BUFFER_BIT);
     
@@ -71,13 +70,10 @@ export class Processor {
    */
   geometry(obj) {
     let gl = this.context;
-    const glConstants = {
-      'TRIANGLE_STRIP' : gl.TRIANGLE_STRIP
-    };
     
     // Create vertices for rectangle
     this.geometries.type = obj.type;
-    this.geometries.glType = glConstants[obj.type];
+    this.geometries.glType = obj.type;
     this.geometries.buffer = gl.createBuffer();
     this.geometries.numVertices = obj.num;
     gl.bindBuffer(gl.ARRAY_BUFFER,this.geometries.buffer);
@@ -142,18 +138,15 @@ export class Processor {
     if (this.framebuffers[fbo_name] === undefined) {
       console.log('CREATE FBO');
       let fbo = gl.createFramebuffer();
-
-      let internalFormat = gl.RGBA;
-      let srcType = gl.UNSIGNED_BYTE;
       
-      if (type == 'uint16' || type === 'float32') {
-        internalFormat = gl.RGBA32F;
-        srcType = gl.FLOAT; 
-      }
+      let [internalFormat, srcType, data] = (type == 'uint16' || type === 'float32') ? 
+        [gl.RGBA32F,gl.FLOAT, new Float32Array(this.width * this.height * 4)] : 
+        [gl.RGBA,gl.UNSIGNED_BYTE, new Uint8ClampedArray(this.width * this.height * 4)];
+
 
       let texture = this._createTexture(
         gl,
-        null,
+        data,
         this.width,
         this.height,
         internalFormat,
@@ -177,7 +170,9 @@ export class Processor {
         id: 'framebuffer',
         name: fbo_name,
         buffer: fbo,
-        texture: texture
+        texture: texture,
+        format: internalFormat,
+        srcType: srcType
       };
     }
     else {
@@ -185,7 +180,7 @@ export class Processor {
     }
     
     gl.bindTexture(gl.TEXTURE_2D, this.framebuffers[fbo_name].texture);
-    gl.viewport(0,0,this.width, this.height);
+
     
     return this;
   }
@@ -210,16 +205,19 @@ export class Processor {
     // Define a PBO for texture data?
     // https://stackoverflow.com/questions/43530082/how-can-i-upload-a-texture-in-webgl2-using-a-pixel-buffer-objecthttps://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
     // https://www.khronos.org/webgl/public-mailing-list/public_webgl/1701/msg00036.php
-    // const pbo = gl.createBuffer();
-    // const data = ctx.getImageData(0, 0, 300, 150).data; 
-    // gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo);
-    // gl.bufferData(gl.PIXEL_UNPACK_BUFFER, data, gl.STATIC_DRAW);
-    // data is now in PBO
+
     // const tex = gl.createTexture();
     // gl.bindTexture(gl.TEXTURE_2D, tex);
     // take data from PBO
     // gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 300, 150, 0, gl.RGBA, gl.UNSIGNED_BYTE, 0);
     
+    // Create a Pixel Buffer Object (PBO) for fast access to pixel data
+    const pbo = gl.createBuffer();
+    gl.bindBuffer(gl.PIXEL_UNPACK_BUFFER, pbo);
+    gl.bufferData(gl.PIXEL_UNPACK_BUFFER, data, gl.STATIC_DRAW);
+    // data is now in PBO
+    
+    // Create a texture
     let texture = gl.createTexture();
 
     // Bind it to texture unit 0' 2D bind point
@@ -246,7 +244,7 @@ export class Processor {
       0, // Border
       srcFormat,
       srcType,
-      data
+      0 // data already in PBO
     );
 
     // Job finished: Unbind texture
@@ -261,6 +259,7 @@ export class Processor {
    * @param {[Object]} array - Array of texture object. The pixel data must be stored as a Raster
    */
   textures(array) {
+    // TODO
     array.forEach( (tex) => this.texture(tex.raster,tex.unit,tex.wrap,tex.mini,tex.mag));
     return this;
   }
@@ -269,7 +268,7 @@ export class Processor {
    * Create and set up a texture
    *
    */
-  texture(raster,unit=0, wrap='clamp',mini='nearest', mag= 'nearest') {
+  texture(raster,unit=0, wrap=gpu.CLAMP,mini=gpu.NEAREST, mag= gpu.NEAREST) {
   
     if (raster.id !== undefined && raster.id === 'framebuffer') {
       console.log('This is a FBO...');
@@ -304,9 +303,9 @@ export class Processor {
       (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
       (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
       glConstants[raster.type],
-      glConstants[wrap],
-      glConstants[mini],
-      glConstants[mag]
+      wrap,
+      mini,
+      mag
     );
     
 
@@ -320,17 +319,38 @@ export class Processor {
    *
    * @author Jean-Christophe Taveau
    */
-  preprocess(options) {
+  preprocess(settings=[]) {
     let gl = this.context;
     
-    // Activate shader program
-    gl.useProgram(this.shader.program);
-    
+    // console.log(settings);
+    // Add Default viewport
+    if (settings.find( (elt) => (elt.name === 'viewport')) === undefined) {
+      settings.push({name:'viewport', params: [0.0,0.0, this.width, this.height]});
+    } 
+
     // Add various rendering parameters
     
     // Blending operations 
-    // TODO
     // gl.enable(gl.BLEND);
+    // viewport operations 
+    // TODO
+
+    settings.forEach( (s) => {
+      switch (s.name) {
+      case 'blend': 
+        gl.blendEquation(s.params[0]);
+        gl.blendFunc(s.params[1], s.params[2]);
+        gl.enable(gl.BLEND);
+        break;
+      case 'viewport': 
+        gl.viewport(s.params[0],s.params[1],s.params[2],s.params[3]);
+        break;
+      }
+    });
+    
+
+    // Activate shader program
+    gl.useProgram(this.shader.program);
     
     return this;
   }
@@ -340,7 +360,7 @@ export class Processor {
    */
   postprocess() {
     // Clean ?
-    
+    // gl.disable(settings)?
     return this;
   }
   
@@ -348,8 +368,21 @@ export class Processor {
 /**
  * 
  */
- readPixels() {
+ readPixels(fbo_name) {
+  let gl = this.context;
+  
   // http://roxlu.com/2014/048/fast-pixel-transfers-with-pixel-buffer-objects
+  // https://github.com/KhronosGroup/WebGL/blob/master/sdk/tests/conformance2/reading/read-pixels-from-rgb8-into-pbo-bug.html
+  let fbo = this.framebuffers[fbo_name];
+  gl.bindFramebuffer(gl.FRAMEBUFFER,fbo.buffer);
+  gl.bindTexture(gl.TEXTURE_2D, fbo.texture);
+
+  // console.log(this.width, this.height);
+  let data = new Float32Array(this.width * this.height * 4); // RGBA
+  gl.readPixels(0, 0, this.width, this.height, gl.RGBA, fbo.srcType, data);
+  
+  return data;
+  
  }
  
  

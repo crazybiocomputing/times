@@ -152,7 +152,7 @@ const createProgram = (gpuEnv,src_vs,src_fs) => {
  */
 
 const rectangle = (w,h) => ({
-    type: 'TRIANGLE_STRIP', 
+    type: gpu.TRIANGLE_STRIP, 
     num: 4,
     vertices: new Float32Array(
       [
