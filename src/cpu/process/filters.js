@@ -164,8 +164,8 @@ const convolve = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=tru
   // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
   // BUG
   const mirror = (pixels, x,y, width,height) => {
-    let xx = ( 2 * (width  - 1)  - x ) % (width - 1);
-    let yy = ( 2 * (height - 1)  - y ) % (height - 1);
+    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
+    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
     return pixels[xx + yy * width];
   };
   

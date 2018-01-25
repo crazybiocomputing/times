@@ -22,6 +22,8 @@
  * Jean-Christophe Taveau
  */
 
+'use strict';
+
 /**
  * @module edgeDetect
  */
@@ -42,3 +44,7 @@ const sobel = (params) => (img,copy=true) => {
   // TODO
   return output;
 }
+
+// http://www.tomgibara.com/computer-vision/CannyEdgeDetector.java
+
+

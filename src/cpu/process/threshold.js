@@ -9,7 +9,7 @@
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,Image
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * GNU General Public License for more details.
@@ -22,6 +22,23 @@
  * Jean-Christophe Taveau
  */
 
+'use strict';
+
+// Helper Functions
+
+// Determine the first non-zero bin
+const getFirstBin = (histogram) => histogram.findIndex( x => x > 0);
+
+// Determine the last non-zero bin
+// const getLastBin = (histogram) => histogram.length - 1 - histogram.slice().reverse().findIndex(x => x>0);
+const getLastBin = (histogram) => histogram.reduceRight( (last,bin,index) => (bin > 0 && last === -1) ? index : last,-1);
+
+// Cumulative Histogram
+const cumulativeHistogram = (histogram) => {
+  // TODO return histogram.map ( bin => bin + );
+};
+
+
 /**
  * Manual thresholding
  *
@@ -33,9 +50,9 @@
  * @author Jean-Christophe Taveau
  */
 const threshold = (value) => (raster,copy_mode = true) => {
-  console.log('threshold '+ value);
   let output = T.Raster.from(raster,copy_mode);
   raster.pixelData.forEach( (px,i) => output.pixelData[i] = (px > value) ? 0 : 255);
+  // Update statistics + histogram
   cpu.histogram(256)(output,copy_mode);
   return output;
 };
@@ -115,16 +132,75 @@ const otsu =  function(raster,copy_mode=true) {
 
 /**
  * Max-entropy thresholding
+ * Implements Kapur-Sahoo-Wong (Maximum Entropy) thresholding method
+ * Kapur J.N., Sahoo P.K., and Wong A.K.C. (1985) "A New Method for
+ * Gray-Level Picture Thresholding Using the Entropy of the Histogram"
+ * Graphical Models and Image Processing, 29(3): 273-285
  *
  * @param {TImage}   raster - Input gray-level image
  * @param {boolean} copy_mode - Boolean used to control the deep copy or not of the pixels data
  * @return {TImage} - Binary output image with True = 0 (black) and False = 255 (white) pixels
  *
- * @author Alexis Hubert
+ * @author M. Emre Celebi 06.15.2007 - Original Code
+ * @author G.Landini - Ported to ImageJ plugin from E Celebi's fourier_0.8 routines
+ * @author Alexis Hubert - Ported to TIMES
+ *
  */
 
-const maxEntropy = function (  raster,copy=true) {
-  // TODO
+const maxEntropy = function (raster,copy=true) {
+  let pixel = raster.pixelData;
+  let data = toHistogram(raster);
+  let thresh=-1;
+  let ih, it;
+  let tot_ent;
+  let ent_back;
+  let ent_obj;
+
+  // Determine the normalized histogram
+  let total = data.reduce((a, b)=> a+b,0); // Number of pixels? raster.pixelData.length
+  let norm_histo = data.map(x => x / total);
+
+  //Calculate cumulative normalized histogram
+  let P1 = [...norm_histo];
+  P1.reduce((a,b,c,d) => d[c] = a+b, 0);
+  let P2 = [...P1];
+  P2.reduce((a,b,c,d) => d[c] = 1-b, 0);
+
+  // Determine the first non-zero bin
+  let first_bin = data.findIndex(x => x>0);
+
+  // Determine the last non-zero bin
+  let last_bin = data.length - 1 - data.slice().reverse().findIndex(x => x>0);
+
+  // Calculate the total entropy each gray-level and find the threshold that maximizes it
+  let max_ent = Number.MIN_VALUE;
+  let list = data.map((x,y)=> y);
+  let list3 = [];
+  let list4= [];
+
+  for (it = first_bin; it <= last_bin; it++ ) {
+
+    // Calculate entropy of background
+    ent_back = 0.0;
+    list3 = list.filter(x=> x<=it);
+    let back = list3.map((a,b)=> data[a] != 0 && (ent_back -= ( norm_histo[a] / P1[it] ) * Math.log ( norm_histo[a] / P1[it] )));
+
+    // Calculate entropy of object
+    ent_obj = 0.0;
+    list4 = list.filter(x=> x>=(it+1));
+    let obj = list4.map((a,b)=> data[a] != 0 && (ent_obj -= ( norm_histo[a] / P2[it] ) * Math.log ( norm_histo[a] / P2[it] )));
+
+    tot_ent = ent_back + ent_obj;
+
+    max_ent < tot_ent && (
+      max_ent = tot_ent,
+      thresh = it
+    );
+  }
+  
+  console.log(`Max Entropy ${thresh}`);
+  
+  return threshold(thresh)(raster);
 };
 
 /**
@@ -190,7 +266,7 @@ const kmeans = (k) => (raster,copy_mode = true) => {
     // If none of them switch cluster : end of loop
     condition = !(labelArray.every((x, idx) => x === newLabelArray[idx]));
     (condition) && (labelArray = newLabelArray);
-    cpt++
+    cpt++;
   }
 
   let minArray = Array(min).fill(0);

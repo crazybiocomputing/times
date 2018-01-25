@@ -22,6 +22,9 @@
  * Jean-Christophe Taveau
  */
 
+'use strict';
+
+
 /**
  * @module statistics
  */
@@ -30,14 +33,14 @@
  * Computes basic stats: min, max, mean/average and standard deviation of the image.
  * Algorithm for variance found in <a href="https://en.wikipedia.org/wiki/Algorithms_for_calculating_variance#Two-pass_algorithm">Wikipedia</a>
  * 
- * @param {Raster} img - Input raster
+ * @param {Raster} raster - Input raster
  * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
  * @return {object} - Returns an object containing min, max, mean, variance
  *
  * @author Jean-Christophe Taveau
  */
-const statistics = (img, copy_mode = true) => {
-  let tmp = img.pixelData.reduce ( (accu,px,i) => {
+const statistics = (raster, copy_mode = true) => {
+  let tmp = raster.pixelData.reduce ( (accu,px,i) => {
     accu.min = Math.min(accu.min,px);
     accu.max = Math.max(accu.max,px);
     accu.mean += px;
@@ -50,17 +53,26 @@ const statistics = (img, copy_mode = true) => {
   {min: Number.MAX_SAFE_INTEGER, max: 0, mean: 0.0, mean2 : 0.0, n: 0, variance: 0.0}
   );
 
-  // Update stats in this TRaster
-  img.statistics = {
+  // Update stats in this Raster
+  raster.statistics = {
     min: tmp.min,
     max: tmp.max,
-    count : img.pixelData.length,
-    mean : tmp.mean / img.pixelData.length,
-    stddev : Math.sqrt(tmp.variance / img.pixelData.length)
+    count : raster.pixelData.length,
+    mean : tmp.mean / raster.pixelData.length,
+    stddev : Math.sqrt(tmp.variance / raster.pixelData.length)
   };
-  return img;
+  return raster;
 };
 
+/**
+ * Computes raster histogram.
+ * 
+ * @param {Raster} raster - Input raster
+ * @param {boolean} copy_mode - Useless here, only for compatibility with the other processing functions
+ * @return {object} - Returns an object containing the histogram in statistics property
+ *
+ * @author Jean-Christophe Taveau
+ */
 const histogram = (binNumber) => (raster, copy_mode = true) => {
   // Update statistics
   let stats = statistics(raster);
