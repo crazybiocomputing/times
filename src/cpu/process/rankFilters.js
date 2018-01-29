@@ -24,6 +24,8 @@
 
 'use strict';
 
+import * as fltr from './filters_common.js';
+
 /**
  * @module rankFilters
  */
@@ -32,13 +34,18 @@
 // Helper Function
 
 // Compute Integral Image ?
-const integral = (data) => {
-    return data.reduce((sum,px,i,arr) => {
-        let x = i % w;
-        sum[x] += px;
-        arr[i] = sum[x] + ((x == 0 ) ? 0.0 : arr[i-1]);
-        return sum;
-    },new Float32Array(w).fill(0.0));   
+const integral = (data,func) => {
+  // Adapted from 
+  // 
+  let integral = new Float32Array(raster.length);
+  let dummy = raster.pixelData.reduce( (rowSum, px, i) => {
+    let x = i % w; // Get X-coord
+    rowSum[x] += func(px);
+    integral[i] = rowSum[x] + ((x === 0) ? 0.0 : integral[ i - 1]);
+    return rowSum;
+    }, 
+    new Float32Array(w).fill(0.0)
+  );  
 }
 
 /**
@@ -59,7 +66,8 @@ const minimum = (kernel) => (img,copy=true) => {
 
 
 /**
- * Variance filter :  It will first compute the summed area table of 
+ * Variance filter
+ * Principle: It will first compute the summed area table of 
  * all the pixels wihtin the first img and after compute the summed squared area 
  * table of all the pixels within the img2.
  * After this process the two img are then padded with 0 according to
@@ -73,7 +81,8 @@ const minimum = (kernel) => (img,copy=true) => {
  * @param {boolean} copy - Copy mode to manage memory usage
  * @return {TRaster} - Filtered Image
  *
- * @author Franck Soubès - Jean-Christophe Taveau 
+ * @author Franck Soubès
+ * @author Jean-Christophe Taveau - Bug Fix
  */
 const varianceFast = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (img,copy_mode = true) => {
 
@@ -81,24 +90,24 @@ const varianceFast = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (img,copy_mo
   let w= img.width;
   let h = img.height;
   let wk = kernel.width;
-    let img2 = new T.Image(img.type,w,h);
-    let squared = img.pixelData.map((x) => x * x );
-    img2.setPixels(squared);
-    let imgsqr= T.Raster.from(img2.raster,copy_mode);
+  let img2 = new T.Image(img.type,w,h);
+  let squared = img.pixelData.map((x) => x * x );
+  img2.setPixels(squared);
+  let imgsqr= T.Raster.from(img2.raster,copy_mode);
 
-     /*
-     	Integral Image proposed by JC.Taveau
-     */
+  // cf: Grzegorz Sarwas & Sławomir Skoneczny, Object Localization and Detection Using Variance Filter.
+  // Compute integral image of sum
+  // Compute integral image of squared sum
+  // Extract boxes and subtract.
 
-    
-
-
-    
-    img2.raster.pixelData.reduce((sum1,px,i) => {
-	let x = i%w;
-	sum1[x] += px;
-	img2.raster.pixelData[i] = sum1[x] + ((x == 0 ) ? 0.0 : img2.raster.pixelData[i-1])
-	return sum1;},new Float32Array(w).fill(0.0));
+  let sum = integral(raster.pixelData,(x) => x);
+  let sumSquared = integral(raster.pixelData,(x) => x * x);
+  img2.raster.pixelData.reduce((sum1,px,i) => {
+    let x = i%w;
+    sum1[x] += px;
+    img2.raster.pixelData[i] = sum1[x] + ((x == 0 ) ? 0.0 : img2.raster.pixelData[i-1])
+    return sum1;
+  },new Float32Array(w).fill(0.0));
     
 
     /*
@@ -224,45 +233,11 @@ return img_returned; // 1d
  */
 const varianceFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
 
-   // Manage clamp to border - outside: 0
-   const clampBorder = (pixels,x,y,width,height) => {
-    return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
-  };
-  
-  // Manage clamp to edge - outside: value of the image edge
-  const clampEdge = (pixels, x,y,width,height) => {
-    let xx = Math.min(Math.max(x,0),width  - 1);
-    let yy = Math.min(Math.max(y,0),height - 1);
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
-  const repeat = (pixels, x,y,width,height) => {
-    let xx = (width  + x ) % width;
-    let yy = (height + y ) % height;
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
-  // BUG
-  const mirror = (pixels, x,y, width,height) => {
-    // BUG
-    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
-    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
-    return pixels[xx + yy * width];
-  };
-  
-  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : clampBorder));
-  console.log(border.name);
-  let input = raster.pixelData;
-  let output =  T.Raster.from(raster,false);
-  // Main 
-  let width = raster.width;
-  let height = raster.height;
-  output.pixelData = input.map( (px, index, pixels) => {
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const varianceFunc = (index,pixels,width,height,kernel,borderFunc) => {
     let [sum, sum2] =  kernel.reduce( (sum,v) => {
-      // Get pixel value in kernel
-      let pix = border(
+      // Get pixel value in kernel depending of border management
+      let pix = borderFunc(
         pixels,
         cpu.getX(index,width) + v.offsetX, 
         cpu.getY(index,width) + v.offsetY,
@@ -274,16 +249,121 @@ const varianceFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,co
       return sum;
     },[0.0,0.0]);
     return (sum2 - (sum * sum)/kernel.length)/(kernel.length - 1);
-  });
+  };
 
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? fltr.clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? fltr.repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : fltr.clampBorder));
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = fltr._convolve(raster.pixelData,raster.width,raster.height,kernel,border,varianceFunc);
+  
   // Normalize image?
   cpu.statistics(output);
   console.log(output.statistics);
   return output;
 }
 
+/*
+ * Generic rank filter : simply apply the variance formula. 
+ *
+ * @author Jean-Christophe Taveau -Bug Fix
+ */
+const rankFilter = (kernel, wrap,raster,copy_mode,rankFunc) => {
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const kernelFunc = (index,pixels,width,height,kernel,borderFunc) => {
+    let values = kernel.reduce( (accu,v) => {
+      // Get pixel value in kernel depending of border management
+      let pix = borderFunc(
+        pixels,
+        cpu.getX(index,width) + v.offsetX, 
+        cpu.getY(index,width) + v.offsetY,
+        width,height);
+      accu.push(pix);
+      return accu;
+    },[]);
+    // Minimum, Maximum or Median
+    return rankFunc(...values);
+  };
 
-export {varianceFilter};
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? fltr.clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? fltr.repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : fltr.clampBorder));
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = fltr._convolve(raster.pixelData,raster.width,raster.height,kernel,border,kernelFunc);
+  
+  // Normalize image?
+  cpu.statistics(output);
+  console.log(output.statistics);
+  return output;
+}
+/**
+ * Minimum filter
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const minimumFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  return rankFilter(kernel,wrap,raster,copy_mode,Math.min);
+}
+
+/**
+ * Maximum filter 
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const maximumFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  return rankFilter(kernel,wrap,raster,copy_mode,Math.max);
+}
+
+/**
+ * Median filter 
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const medianFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  const median = (...values) => {
+    values.sort( (a,b) => a - b);
+    let half = Math.floor(values.length / 2);
+    return (values.length % 2) ? values[half] : (values[half-1] + values[half]) / 2.0;
+  };
+
+  return rankFilter(kernel,wrap,raster,copy_mode,median);
+}
+
+
+
+export {medianFilter, maximumFilter, minimumFilter, varianceFilter};
 
 
 

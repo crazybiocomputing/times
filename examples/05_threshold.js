@@ -4,13 +4,6 @@
  * @author Jean-Christophe Taveau
  */
  
-
-/////////////////////////////////////
-//
-// O T S U
-//
-/////////////////////////////////////
-
 /*
  * Test image #1
  * From http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html
@@ -25,7 +18,26 @@
   5,5,4,3,1,0
 ];
 
+/*
+ * Test image #2: Boats from ImageJ
+ * 
+ * ImageJ JS script to get histogram
+ *
+ * let imp = IJ.openImage("http://wsr.imagej.net/images/boats.gif");
+ * IJ.run(imp, "Size...", "width=360 height=288 constrain average interpolation=Bilinear");
+ * IJ.run(imp, "Histogram", "");
+ * IJ.saveAs("Results", "Histogram of boats.csv");
+ *
+ */
+ 
+ 
+/////////////////////////////////////
+//
+// O T S U
+//
+/////////////////////////////////////
 
+// Test 1
 let img1 = new T.Image('uint8',6,6);
 img1.setPixels(new Uint8ClampedArray(pixels));
 let raster1 = img1.getRaster();
@@ -47,20 +59,10 @@ else {
   document.getElementById('test').innerHTML +='<p>Test Image From http://www.labbookpages.co.uk/software/imgProc/otsuThreshold.html:  <b>KO</b></p>';
 }
 
-/*
- * Test image #2: Boats from ImageJ
- * 
- * ImageJ JS script to get histogram
- *
- * let imp = IJ.openImage("http://wsr.imagej.net/images/boats.gif");
- * IJ.run(imp, "Size...", "width=360 height=288 constrain average interpolation=Bilinear");
- * IJ.run(imp, "Histogram", "");
- * IJ.saveAs("Results", "Histogram of boats.csv");
- *
- */
+
  
 /*
- Results below
+ Test 2 Boats
 */
 let thresholdOtsuImageJ = 93;
 
@@ -91,5 +93,29 @@ if (test2 === true) {
 else {
   document.getElementById('test').innerHTML +='<p>Test Boats :  <b>KO</b></p>';
 }
+
+
+/////////////////////////////////////
+//
+// Max-entropy
+//
+/////////////////////////////////////
+
+
+
+/////////////////////////////////////
+//
+// K-means
+//
+/////////////////////////////////////
+
+
+/////////////////////////////////////
+//
+// Adaptive Threshold
+//
+/////////////////////////////////////
+
+
 
 

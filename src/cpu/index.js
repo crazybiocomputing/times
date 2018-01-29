@@ -32,9 +32,12 @@ import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, sat
 /* Process/geometry */
 import {crop} from './process/geometry';
 
+/* Process/edgeDetect */
+import {laplacian3x3,laplacian5x5,sobel3x3} from './process/edgeDetect';
+
 /* Process/filters */
-import {CPU_HARDWARE,GPU_HARDWARE,
-  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,
+import {
+  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,KERNEL_SQUARE,
   BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
   convolve,convolutionKernel,mean,meanKernel} from './process/filters';
 
@@ -44,8 +47,14 @@ import {black,calc,chessboard,fillColor,fill,math,ramp,spiral,white} from './pro
 /* Process/noise */
 import {noise,saltAndPepper} from './process/noise';
 
+/* Process/rankFilters */
+import {medianFilter,maximumFilter, minimumFilter, varianceFilter} from './process/rankFilters';
+
 //* Process/statistics */
 import {histogram,statistics} from './process/statistics';
+
+//* Process/type */
+import {otsu,threshold} from './process/threshold';
 
 //* Process/type */
 import {fromABGRtoUint8} from './process/type';
@@ -63,13 +72,15 @@ export {
   red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
   splitChannels,toRGBA,
   crop,
-  CPU_HARDWARE,GPU_HARDWARE,
-  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,
+  laplacian3x3,laplacian5x5,sobel3x3,
+  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,KERNEL_SQUARE,
   BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
   convolve,convolutionKernel,mean,meanKernel,
   black,calc,chessboard,fillColor,fill,math,ramp,spiral,white,
   noise,saltAndPepper,
+  medianFilter,maximumFilter, minimumFilter, varianceFilter,
   histogram,statistics,
+  otsu,threshold,
   fromABGRtoUint8,
   montage,view,
   renderUint8,renderUint16,renderFloat32,renderABGR,renderRGBA,render2D,

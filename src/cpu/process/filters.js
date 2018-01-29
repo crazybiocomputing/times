@@ -24,6 +24,8 @@
 
 'use strict';
 
+import * as fltr from './filters_common.js';
+
 /**
  * @module filters
  */
@@ -40,6 +42,8 @@ const KERNEL_DIAMOND = 2;
 
 const KERNEL_CIRCLE = 4;
 
+const KERNEL_SQUARE = 8;
+
 const BORDER_CLAMP_TO_EDGE = 0;
 
 const BORDER_CLAMP_TO_BORDER = 1;
@@ -53,13 +57,13 @@ const BORDER_MIRROR = 4;
  *
  * @author Jean-Christophe Taveau
  */
-const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) => {
+const getKernelOffsets = (type, w, h, weights, stepX = 1, stepY = 1) => {
   const getOffsetX = (i,w,h) => (cpu.getX(i,w) - Math.floor(w/2.0) ) * stepX; 
   const getOffsetY = (i,w,h) => (cpu.getY(i,w) - Math.floor(h/2.0) ) * stepY;
 
   let offsets;
 
-  if (type === KERNEL_RECTANGLE) {
+  if (type === KERNEL_RECTANGLE || type === KERNEL_SQUARE) {
     offsets = Array.from(
       {length: w * h}, 
       (v, i) => ({offsetX: getOffsetX(i,w,h), offsetY: getOffsetY(i,w,h), weight: weights[i]}) 
@@ -71,7 +75,7 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
     offsets = series.reduce( (accu, v, i) => {
       let x = getOffsetX(i,w,w);
       let y = getOffsetY(i,w,w);
-      
+      // Distance?
       if (x * x + y * y <= radius * radius) {
         accu.push({offsetX: x,offsetY: y,weight: weights[i]});
       }
@@ -79,17 +83,12 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
     },[]);
 
   }
-  // CPU: Array of objects [{offsetX, offsetY, weight},{offsetX, offsetY, weight}, ..]
-  // GPU: Array of [offsetX, offsetY, weight,offsetX, offsetY, weight,..]
-  // TODO let offsets.reduce( (flatten,cell) => flatten = [..flatten,...Object.keys(cell).map((k) => cell[k])],[]);
   return offsets;
 }
 
 /*
  * Kernel for convolution
  *
- *
- * @param {number} hardware
  * @param {number} type
  * @param {number} size  - size or radius if circular kernel
  * @param {Array[number]} weight - 1D Array containing the various weights. For circular kernel, the weights must be given as an array of length (size * size).
@@ -97,9 +96,11 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
  * 
  * @author Jean-Christophe Taveau
  */
-const convolutionKernel = (hardware, type, width, height_or_radius, weights, normalize = true) => {
+const convolutionKernel = (type, width, height_or_radius, weights, normalize = true) => {
   // Precalculate weights and offsets
-  let kernel = getKernelOffsets(hardware, type, width, height_or_radius,weights);
+  // Array of objects [{offsetX, offsetY, weight},{offsetX, offsetY, weight}, ..]
+
+  let kernel = getKernelOffsets(type, width, height_or_radius,weights);
 
   // Compute the sum of kernel weight for normalization
   let sum = kernel.reduce ( (sum,v) => sum + v.weight, 0);
@@ -112,7 +113,7 @@ const convolutionKernel = (hardware, type, width, height_or_radius, weights, nor
  *
  * @author Jean-Christophe Taveau
  */
-const meanKernel = (hardware, type, width, height_or_radius, normalize = true) => {
+const meanKernel = (type, width, height_or_radius, normalize = true) => {
   // Precalculate weights and offsets
   let kernel = getKernelOffsets(hardware, type, width, height_or_radius, weights);
   // Compute the sum of kernel weight for normalization
@@ -121,7 +122,7 @@ const meanKernel = (hardware, type, width, height_or_radius, normalize = true) =
   return (normalize) ? kernel.map ( (v) => v.weight /= sum) : kernel;
 }
 
-const gaussBlurKernel = (hardware, type, size, normalize = true) => {
+const gaussBlurKernel = (type, size, normalize = true) => {
   // Precalculate weights and offsets
   let kernel = getKernelOffsets(hardware, type, size, size, radius);
   // Compute the sum of kernel weight for normalization
@@ -134,59 +135,36 @@ const gaussBlurKernel = (hardware, type, size, normalize = true) => {
 /**
  * Convolve operation
  *
- * @param {TRaster} kernel - Convolution mask
- * @param {TRaster} img - Input image to process
+ * @param {[number]} kernel - Convolution mask
+ * @param {Raster} raster - Input image to process
  * @param {boolean} copy - Copy mode to manage memory usage
- * @return {TRaster} - Filtered Image
+ * @return {Raster} - Filtered Image
  *
  * @author Jean-Christophe Taveau
  */
 const convolve = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
-  // Manage clamp to border - outside: 0
-  const clampBorder = (pixels,x,y,width,height) => {
-    return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
-  };
-  
-  // Manage clamp to edge - outside: value of the image edge
-  const clampEdge = (pixels, x,y,width,height) => {
-    let xx = Math.min(Math.max(x,0),width  - 1);
-    let yy = Math.min(Math.max(y,0),height - 1);
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
-  const repeat = (pixels, x,y,width,height) => {
-    let xx = (width  + x ) % width;
-    let yy = (height + y ) % height;
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
-  // BUG
-  const mirror = (pixels, x,y, width,height) => {
-    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
-    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
-    return pixels[xx + yy * width];
-  };
-  
-  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : clampBorder));
-  console.log(border.name);
-  let input = raster.pixelData;
-  let output =  T.Raster.from(raster,false);
-  // Main 
-  let width = raster.width;
-  let height = raster.height;
-  output.pixelData = input.map( (px, index, pixels) => {
+
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const linearFunc = (index,pixels,width,height,kernel,borderFunc) => {
     return kernel.reduce( (sum,v) => {
-      sum += border(
+      sum += borderFunc(
         pixels,
         cpu.getX(index,width) + v.offsetX, 
         cpu.getY(index,width) + v.offsetY,
         width,height
       ) * v.weight;
       return sum;
-    },0.0);
-  });
+    },0.0);  
+  };
+
+  // Main 
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? fltr.clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? fltr.repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : fltr.clampBorder));
+  console.log(border.name);
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = fltr._convolve(raster.pixelData,raster.width,raster.height,kernel,border,linearFunc);
+
   return output;
 }
 
@@ -223,9 +201,8 @@ const convolveSeparable = (kernel1, kernel2, wrap = cpu.BORDER_CLAMP_TO_BORDER) 
  * @author TODO
  */
 const gaussBlur = (kernel) => (raster,copy=true) => {
-  let output =  TRaster.from(img,copy);
   // TODO
-  return output;
+  return convolve(kernel)(raster,copy);
 }
 
 /**
@@ -239,12 +216,11 @@ const gaussBlur = (kernel) => (raster,copy=true) => {
  * @author TODO
  */
 const mean = (kernel) => (raster,copy=true) => {
-  return convolve(kernel)(img,copy);
+  return convolve(kernel)(raster,copy);
 }
 
 export {
-  CPU_HARDWARE,GPU_HARDWARE,
-  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,
+  KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,KERNEL_SQUARE,
   BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
   convolve,convolutionKernel,mean,meanKernel
 }

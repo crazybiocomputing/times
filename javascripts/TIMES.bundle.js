@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -89,7 +89,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return pipe; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return radians; });
 /* unused harmony export statistics */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_TIMES__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_TIMES__ = __webpack_require__(2);
 /*
  *  times: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -291,6 +291,102 @@ const getY = (index,width) => Math.floor(index / width);
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return _convolve; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return linearFunc; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return clampBorder; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return clampEdge; });
+/* unused harmony export mirror */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return repeat; });
+  /*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+// Manage clamp to border - outside: 0
+const clampBorder = (pixels,x,y,width,height) => {
+  return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
+};
+  
+// Manage clamp to edge - outside: value of the image edge
+const clampEdge = (pixels, x,y,width,height) => {
+  let xx = Math.min(Math.max(x,0),width  - 1);
+  let yy = Math.min(Math.max(y,0),height - 1);
+  return pixels[xx + yy * width];
+};
+  
+// Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
+const repeat = (pixels, x,y,width,height) => {
+  let xx = (width  + x ) % width;
+  let yy = (height + y ) % height;
+  return pixels[xx + yy * width];
+};
+  
+// Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
+// HACK: BUG
+const mirror = (pixels, x,y, width,height) => {
+  let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
+  let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
+  return pixels[xx + yy * width];
+};
+  
+// Linear Filter: Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+const linearFunc = (index,pixels,width,height,kernel,borderFunc) => {
+  return kernel.reduce( (sum,v) => {
+    sum += borderFunc(
+      pixels,
+      cpu.getX(index,width) + v.offsetX, 
+      cpu.getY(index,width) + v.offsetY,
+      width,height
+    ) * v.weight;
+    return sum;
+  },0.0); 
+};
+
+
+/*
+ * Convolve
+ * data - pixels
+ * @param {number} width
+ * @param {number} height
+ * kernel - kernel offsets
+ * borderFunc - function handling borders
+ * kernelFunc - function computing output pixel value
+ */ 
+const _convolve = (data,width,height,kernel,borderFunc,kernelFunc) => {
+  return data.map( (px, index, pixels) => {
+    return kernelFunc(index,pixels,width,height,kernel,borderFunc);
+  });
+};
+
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return TIMES; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
@@ -327,15 +423,15 @@ TIMES.initStorage = () => TIMES.storage = [];
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_index_js__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__io_loadImage__ = __webpack_require__(10);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__ = __webpack_require__(11);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_index_js__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__core_index_js__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__io_loadImage__ = __webpack_require__(11);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__ = __webpack_require__(12);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_index_js__ = __webpack_require__(26);
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "T", function() { return __WEBPACK_IMPORTED_MODULE_0__core_index_js__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "io", function() { return __WEBPACK_IMPORTED_MODULE_1__io_loadImage__; });
 /* harmony reexport (module object) */ __webpack_require__.d(__webpack_exports__, "cpu", function() { return __WEBPACK_IMPORTED_MODULE_2__cpu_index_js__; });
@@ -384,18 +480,18 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TIMES__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Raster__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Image__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Stack__ = __webpack_require__(6);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Volume__ = __webpack_require__(7);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Window__ = __webpack_require__(8);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__View__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TIMES__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__Raster__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Image__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Stack__ = __webpack_require__(7);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Volume__ = __webpack_require__(8);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__Window__ = __webpack_require__(9);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__View__ = __webpack_require__(10);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Raster", function() { return __WEBPACK_IMPORTED_MODULE_1__Raster__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Image", function() { return __WEBPACK_IMPORTED_MODULE_2__Image__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Stack", function() { return __WEBPACK_IMPORTED_MODULE_3__Stack__["a"]; });
@@ -443,7 +539,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -756,7 +852,7 @@ class Raster {
 
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -908,7 +1004,7 @@ class Image {
 
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1057,7 +1153,7 @@ class Stack {
 
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1155,7 +1251,7 @@ class Volume {
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1362,7 +1458,7 @@ class Window {
 
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1455,7 +1551,7 @@ class View {
 
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1542,24 +1638,25 @@ const loadImage = (data) => {
 
 
 /***/ }),
-/* 11 */
+/* 12 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__process_utils__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__process_color__ = __webpack_require__(12);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__process_geometry__ = __webpack_require__(13);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__process_filters__ = __webpack_require__(14);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__process_math__ = __webpack_require__(15);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__process_noise__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_rankFilters__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__process_statistics__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_threshold__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_type__ = __webpack_require__(20);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__render_view__ = __webpack_require__(21);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__render_render2D__ = __webpack_require__(22);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__render_renderVector__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__process_color__ = __webpack_require__(13);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__process_geometry__ = __webpack_require__(14);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__process_edgeDetect__ = __webpack_require__(15);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__process_filters__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__process_math__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__process_noise__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__process_rankFilters__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__process_statistics__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__process_threshold__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_10__process_type__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_11__render_view__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_12__render_render2D__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_13__render_renderVector__ = __webpack_require__(25);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clamp", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["a"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "clampUint8", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["b"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "degrees", function() { return __WEBPACK_IMPORTED_MODULE_0__process_utils__["c"]; });
@@ -1581,46 +1678,51 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "splitChannels", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["j"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "toRGBA", function() { return __WEBPACK_IMPORTED_MODULE_1__process_color__["k"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "crop", function() { return __WEBPACK_IMPORTED_MODULE_2__process_geometry__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "CPU_HARDWARE", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "GPU_HARDWARE", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_RECTANGLE", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["j"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_CROSS", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_DIAMOND", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_CIRCLE", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_CLAMP_TO_EDGE", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_CLAMP_TO_BORDER", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_REPEAT", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_MIRROR", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "convolve", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["l"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "convolutionKernel", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["k"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "mean", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["m"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "meanKernel", function() { return __WEBPACK_IMPORTED_MODULE_3__process_filters__["n"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "black", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chessboard", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "math", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["g"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "spiral", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["h"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "white", function() { return __WEBPACK_IMPORTED_MODULE_4__process_math__["i"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noise", function() { return __WEBPACK_IMPORTED_MODULE_5__process_noise__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_5__process_noise__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "varianceFilter", function() { return __WEBPACK_IMPORTED_MODULE_6__process_rankFilters__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "histogram", function() { return __WEBPACK_IMPORTED_MODULE_7__process_statistics__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "statistics", function() { return __WEBPACK_IMPORTED_MODULE_7__process_statistics__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "otsu", function() { return __WEBPACK_IMPORTED_MODULE_8__process_threshold__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "threshold", function() { return __WEBPACK_IMPORTED_MODULE_8__process_threshold__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fromABGRtoUint8", function() { return __WEBPACK_IMPORTED_MODULE_9__process_type__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_10__render_view__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["f"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint16", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["e"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderFloat32", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["c"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderABGR", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["b"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["d"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_11__render_render2D__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_12__render_renderVector__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "laplacian3x3", function() { return __WEBPACK_IMPORTED_MODULE_3__process_edgeDetect__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "laplacian5x5", function() { return __WEBPACK_IMPORTED_MODULE_3__process_edgeDetect__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "sobel3x3", function() { return __WEBPACK_IMPORTED_MODULE_3__process_edgeDetect__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_RECTANGLE", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_CROSS", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_DIAMOND", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_CIRCLE", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "KERNEL_SQUARE", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_CLAMP_TO_EDGE", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_CLAMP_TO_BORDER", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_REPEAT", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "BORDER_MIRROR", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "convolve", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["k"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "convolutionKernel", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["j"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "mean", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["l"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "meanKernel", function() { return __WEBPACK_IMPORTED_MODULE_4__process_filters__["m"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "black", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "calc", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "chessboard", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fillColor", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fill", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "math", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "ramp", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["g"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "spiral", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["h"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "white", function() { return __WEBPACK_IMPORTED_MODULE_5__process_math__["i"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "noise", function() { return __WEBPACK_IMPORTED_MODULE_6__process_noise__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "saltAndPepper", function() { return __WEBPACK_IMPORTED_MODULE_6__process_noise__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "medianFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__process_rankFilters__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "maximumFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__process_rankFilters__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "minimumFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__process_rankFilters__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "varianceFilter", function() { return __WEBPACK_IMPORTED_MODULE_7__process_rankFilters__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "histogram", function() { return __WEBPACK_IMPORTED_MODULE_8__process_statistics__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "statistics", function() { return __WEBPACK_IMPORTED_MODULE_8__process_statistics__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "otsu", function() { return __WEBPACK_IMPORTED_MODULE_9__process_threshold__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "threshold", function() { return __WEBPACK_IMPORTED_MODULE_9__process_threshold__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "fromABGRtoUint8", function() { return __WEBPACK_IMPORTED_MODULE_10__process_type__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "montage", function() { return __WEBPACK_IMPORTED_MODULE_11__render_view__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "view", function() { return __WEBPACK_IMPORTED_MODULE_11__render_view__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint8", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["f"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderUint16", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["e"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderFloat32", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["c"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderABGR", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["b"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderRGBA", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["d"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "render2D", function() { return __WEBPACK_IMPORTED_MODULE_12__render_render2D__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "renderVector", function() { return __WEBPACK_IMPORTED_MODULE_13__render_renderVector__["a"]; });
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -1653,6 +1755,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /* Process/geometry */
+
+
+/* Process/edgeDetect */
 
 
 /* Process/filters */
@@ -1689,7 +1794,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 12 */
+/* 13 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -1944,7 +2049,7 @@ const splitChannels = (...fns) => (color_img,copy = true) => {
 
 
 /***/ }),
-/* 13 */
+/* 14 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2049,24 +2154,14 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 
 /***/ }),
-/* 14 */
+/* 15 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return CPU_HARDWARE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return GPU_HARDWARE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return KERNEL_RECTANGLE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return KERNEL_CROSS; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return KERNEL_DIAMOND; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return KERNEL_CIRCLE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return BORDER_CLAMP_TO_EDGE; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BORDER_CLAMP_TO_BORDER; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return BORDER_REPEAT; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return BORDER_MIRROR; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return convolve; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return convolutionKernel; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return mean; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return meanKernel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return laplacian3x3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return laplacian5x5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return sobel3x3; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__filters_common_js__ = __webpack_require__(1);
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -2093,6 +2188,247 @@ const translate = (angle) => (raster,copy_mode=true) => console.log('TODO: trans
 
 
 
+
+
+/**
+ * @module edgeDetect
+ */
+ 
+
+/**
+ * Laplacian 3x3 Edge Detection Filter
+ *    -1,-1,-1,
+ *    -1, 8,-1,
+ *    -1,-1,-1
+ * @param {type} params - Parameters
+ * @param {TRaster} img - Input image
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - A filtered image
+ *
+ * @author Jean-Christophe Taveau
+ */
+const laplacian3x3 = (wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
+
+  // Laplacian3x3 Filter: Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const laplaceFunc = (index,pixels,width,height,kernel,borderFunc) => {
+    // All is hard-coded for speed
+    // `kernel` is unused
+    let x = cpu.getX(index,width);
+    let y = cpu.getY(index,width);
+    let p0 = borderFunc(pixels, x - 1,  y - 1,width,height);
+    let p1 = borderFunc(pixels, x    ,  y - 1,width,height);
+    let p2 = borderFunc(pixels, x + 1,  y - 1,width,height);
+    let p3 = borderFunc(pixels, x - 1,  y    ,width,height);
+    let p4 = borderFunc(pixels, x    ,  y    ,width,height);
+    let p5 = borderFunc(pixels, x + 1,  y    ,width,height);
+    let p6 = borderFunc(pixels, x - 1,  y + 1,width,height);
+    let p7 = borderFunc(pixels, x    ,  y + 1,width,height);
+    let p8 = borderFunc(pixels, x + 1,  y + 1,width,height);
+   
+    return -p0 - p1 - p2 - p3 + 8 * p4 - p5 - p6 - p7 - p8;
+  };
+
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+
+  let output =  T.Raster.from(raster,false);
+
+  // 1-pass filter 
+  output.pixelData = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](raster.pixelData,raster.width,raster.height,null,border,laplaceFunc);
+
+  // Normalize image?
+  // cpu.statistics(output);
+
+  return output;
+}
+
+/**
+ * Laplacian 5x5 Edge Detection Filter
+ *
+ * @param {number} wrap - Wrap mode for border handling
+ * @param {Raster} raster - Input raster
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {Raster} - A filtered image
+ *
+ * @author Jean-Christophe Taveau
+ */
+const laplacian5x5 = (wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+
+  let output =  T.Raster.from(raster,false);
+
+  // Must be hard-coded?
+  let kernel = cpu.convolutionKernel(
+    cpu.KERNEL_SQUARE, 5, 5,                        
+    [
+      0, 0,-1, 0, 0,
+      0,-1,-2,-1, 0,
+     -1,-2,16,-2,-1,
+      0,-1,-2,-1, 0,
+      0, 0,-1, 0, 0,
+
+   ],
+    false // No kernel normalization!!  
+  );
+
+  // 1-pass filter 
+  output.pixelData = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](raster.pixelData,raster.width,raster.height,kernel,border,__WEBPACK_IMPORTED_MODULE_0__filters_common_js__["d" /* linearFunc */]);
+
+  // Normalize image?
+  // cpu.statistics(output);
+
+  return output;
+}
+
+/**
+ * Sobel 3x3 Edge Detection Filter
+ *
+ * @param {type} params - Parameters
+ * @param {TRaster} img - Input image
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - A filtered image
+ *
+ * @author Jean-Christophe Taveau
+ */
+const sobel3x3 = (wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
+
+  // Sobel Filter: Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const sobelFunc = (index,pixels,width,height,kernel,borderFunc) => {
+    // All is hard-coded for speed
+    // `kernel` is unused
+    let x = cpu.getX(index,width);
+    let y = cpu.getY(index,width);
+    let p0 = borderFunc(pixels, x - 1,  y - 1,width,height);
+    let p1 = borderFunc(pixels, x    ,  y - 1,width,height);
+    let p2 = borderFunc(pixels, x + 1,  y - 1,width,height);
+    let p3 = borderFunc(pixels, x - 1,  y    ,width,height);
+    // p4 is always zero, here.
+    let p5 = borderFunc(pixels, x + 1,  y    ,width,height);
+    let p6 = borderFunc(pixels, x - 1,  y + 1,width,height);
+    let p7 = borderFunc(pixels, x    ,  y + 1,width,height);
+    let p8 = borderFunc(pixels, x + 1,  y + 1,width,height);
+
+    let Gx = p0 - p2 + 2 * p3 - 2 * p5 + p6 -p8;
+    let Gy = p0 + 2 * p1 + p2 - p6 - 2 * p7 - p8;
+    
+    return Math.sqrt(Gx * Gx + Gy * Gy);
+  };
+
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+
+  let output =  T.Raster.from(raster,false);
+
+  // convolution
+  let tmp = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](new Float32Array(raster.pixelData),raster.width,raster.height,null,border,sobelFunc);
+
+  /*
+  // Define separable kernels
+  let kernelX_pass1 = cpu.convolutionKernel(cpu.KERNEL_SQUARE, 3, 1, [-1,0,1],false);
+  let kernelX_pass2 = cpu.convolutionKernel(cpu.KERNEL_SQUARE, 1, 3, [1,2,1],false);
+  let kernelY_pass1 = cpu.convolutionKernel(cpu.KERNEL_SQUARE, 3, 1, [1,2,1],false);
+  let kernelY_pass2 = cpu.convolutionKernel(cpu.KERNEL_SQUARE, 1, 3, [-1,0,1],false);
+  
+  let kernelX = cpu.convolutionKernel(
+    cpu.KERNEL_SQUARE, 3, 3,                        
+    [
+       1,0,-1,
+       2,0,-2,
+       1,0,-1
+    ],
+    false // No kernel normalization!!  
+  );
+
+  let kernelY = cpu.convolutionKernel(
+    cpu.KERNEL_SQUARE, 3, 3,                        
+    [
+       1, 2, 1,
+       0, 0, 0,
+      -1,-2,-1
+    ],
+    false // No kernel normalization!!  
+  );
+  
+  // 2-pass filter 
+
+  let tmp = fltr._convolve(raster.pixelData,raster.width,raster.height,kernelX_pass1,border,fltr.linearFunc);
+  let gradientX = fltr._convolve(tmp,raster.width,raster.height,kernelX_pass2,border,fltr.linearFunc);
+  tmp = fltr._convolve(raster.pixelData,raster.width,raster.height,kernelY_pass1,border,fltr.linearFunc);
+  let gradientY = fltr._convolve(raster.pixelData,raster.width,raster.height,kernelY,border,fltr.linearFunc);
+
+  // 1-pass filter 
+  // For temporary computations, use Float32Array
+  let gradientX = fltr._convolve(new Float32Array(raster.pixelData),raster.width,raster.height,kernelX,border,fltr.linearFunc);
+  let gradientY = fltr._convolve(new Float32Array(raster.pixelData),raster.width,raster.height,kernelY,border,fltr.linearFunc);
+  
+  // Absolute values - faster
+  // output.pixelData = gradientX.map( (px,i) => Math.abs(px) + Math.abs(gradientY[i]) );
+
+  // square root
+  let tmp = gradientX.map( (gx,i) => Math.trunc(Math.sqrt(gx * gx + gradientY[i] * gradientY[i])) );
+ */
+  // Normalize image?
+  output.pixelData = (output.type === 'uint8' ? new Uint8ClampedArray(tmp) : (output.type === 'uint16' ? new Uint16Array(tmp) : tmp) );
+
+  // cpu.statistics(output);
+  return output;
+}
+
+// http://www.tomgibara.com/computer-vision/CannyEdgeDetector.java
+
+
+
+
+
+
+/***/ }),
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return KERNEL_RECTANGLE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return KERNEL_CROSS; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return KERNEL_DIAMOND; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return KERNEL_CIRCLE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return KERNEL_SQUARE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return BORDER_CLAMP_TO_EDGE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BORDER_CLAMP_TO_BORDER; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return BORDER_REPEAT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return BORDER_MIRROR; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return convolve; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return convolutionKernel; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return mean; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return meanKernel; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__filters_common_js__ = __webpack_require__(1);
+/*
+ *  TIMES: Tiny Image ECMAScript Application
+ *  Copyright (C) 2017  Jean-Christophe Taveau.
+ *
+ *  This file is part of TIMES
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,Image
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with TIMES.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ *
+ * Authors:
+ * Jean-Christophe Taveau
+ */
+
+
+
+
+
 /**
  * @module filters
  */
@@ -2109,6 +2445,8 @@ const KERNEL_DIAMOND = 2;
 
 const KERNEL_CIRCLE = 4;
 
+const KERNEL_SQUARE = 8;
+
 const BORDER_CLAMP_TO_EDGE = 0;
 
 const BORDER_CLAMP_TO_BORDER = 1;
@@ -2122,13 +2460,13 @@ const BORDER_MIRROR = 4;
  *
  * @author Jean-Christophe Taveau
  */
-const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) => {
+const getKernelOffsets = (type, w, h, weights, stepX = 1, stepY = 1) => {
   const getOffsetX = (i,w,h) => (cpu.getX(i,w) - Math.floor(w/2.0) ) * stepX; 
   const getOffsetY = (i,w,h) => (cpu.getY(i,w) - Math.floor(h/2.0) ) * stepY;
 
   let offsets;
 
-  if (type === KERNEL_RECTANGLE) {
+  if (type === KERNEL_RECTANGLE || type === KERNEL_SQUARE) {
     offsets = Array.from(
       {length: w * h}, 
       (v, i) => ({offsetX: getOffsetX(i,w,h), offsetY: getOffsetY(i,w,h), weight: weights[i]}) 
@@ -2140,7 +2478,7 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
     offsets = series.reduce( (accu, v, i) => {
       let x = getOffsetX(i,w,w);
       let y = getOffsetY(i,w,w);
-      
+      // Distance?
       if (x * x + y * y <= radius * radius) {
         accu.push({offsetX: x,offsetY: y,weight: weights[i]});
       }
@@ -2148,17 +2486,12 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
     },[]);
 
   }
-  // CPU: Array of objects [{offsetX, offsetY, weight},{offsetX, offsetY, weight}, ..]
-  // GPU: Array of [offsetX, offsetY, weight,offsetX, offsetY, weight,..]
-  // TODO let offsets.reduce( (flatten,cell) => flatten = [..flatten,...Object.keys(cell).map((k) => cell[k])],[]);
   return offsets;
 }
 
 /*
  * Kernel for convolution
  *
- *
- * @param {number} hardware
  * @param {number} type
  * @param {number} size  - size or radius if circular kernel
  * @param {Array[number]} weight - 1D Array containing the various weights. For circular kernel, the weights must be given as an array of length (size * size).
@@ -2166,9 +2499,11 @@ const getKernelOffsets = (hardware, type, w, h, weights, stepX = 1, stepY = 1) =
  * 
  * @author Jean-Christophe Taveau
  */
-const convolutionKernel = (hardware, type, width, height_or_radius, weights, normalize = true) => {
+const convolutionKernel = (type, width, height_or_radius, weights, normalize = true) => {
   // Precalculate weights and offsets
-  let kernel = getKernelOffsets(hardware, type, width, height_or_radius,weights);
+  // Array of objects [{offsetX, offsetY, weight},{offsetX, offsetY, weight}, ..]
+
+  let kernel = getKernelOffsets(type, width, height_or_radius,weights);
 
   // Compute the sum of kernel weight for normalization
   let sum = kernel.reduce ( (sum,v) => sum + v.weight, 0);
@@ -2181,7 +2516,7 @@ const convolutionKernel = (hardware, type, width, height_or_radius, weights, nor
  *
  * @author Jean-Christophe Taveau
  */
-const meanKernel = (hardware, type, width, height_or_radius, normalize = true) => {
+const meanKernel = (type, width, height_or_radius, normalize = true) => {
   // Precalculate weights and offsets
   let kernel = getKernelOffsets(hardware, type, width, height_or_radius, weights);
   // Compute the sum of kernel weight for normalization
@@ -2190,7 +2525,7 @@ const meanKernel = (hardware, type, width, height_or_radius, normalize = true) =
   return (normalize) ? kernel.map ( (v) => v.weight /= sum) : kernel;
 }
 
-const gaussBlurKernel = (hardware, type, size, normalize = true) => {
+const gaussBlurKernel = (type, size, normalize = true) => {
   // Precalculate weights and offsets
   let kernel = getKernelOffsets(hardware, type, size, size, radius);
   // Compute the sum of kernel weight for normalization
@@ -2203,59 +2538,36 @@ const gaussBlurKernel = (hardware, type, size, normalize = true) => {
 /**
  * Convolve operation
  *
- * @param {TRaster} kernel - Convolution mask
- * @param {TRaster} img - Input image to process
+ * @param {[number]} kernel - Convolution mask
+ * @param {Raster} raster - Input image to process
  * @param {boolean} copy - Copy mode to manage memory usage
- * @return {TRaster} - Filtered Image
+ * @return {Raster} - Filtered Image
  *
  * @author Jean-Christophe Taveau
  */
 const convolve = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy=true) => {
-  // Manage clamp to border - outside: 0
-  const clampBorder = (pixels,x,y,width,height) => {
-    return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
-  };
-  
-  // Manage clamp to edge - outside: value of the image edge
-  const clampEdge = (pixels, x,y,width,height) => {
-    let xx = Math.min(Math.max(x,0),width  - 1);
-    let yy = Math.min(Math.max(y,0),height - 1);
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
-  const repeat = (pixels, x,y,width,height) => {
-    let xx = (width  + x ) % width;
-    let yy = (height + y ) % height;
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
-  // BUG
-  const mirror = (pixels, x,y, width,height) => {
-    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
-    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
-    return pixels[xx + yy * width];
-  };
-  
-  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : clampBorder));
-  console.log(border.name);
-  let input = raster.pixelData;
-  let output =  T.Raster.from(raster,false);
-  // Main 
-  let width = raster.width;
-  let height = raster.height;
-  output.pixelData = input.map( (px, index, pixels) => {
+
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const linearFunc = (index,pixels,width,height,kernel,borderFunc) => {
     return kernel.reduce( (sum,v) => {
-      sum += border(
+      sum += borderFunc(
         pixels,
         cpu.getX(index,width) + v.offsetX, 
         cpu.getY(index,width) + v.offsetY,
         width,height
       ) * v.weight;
       return sum;
-    },0.0);
-  });
+    },0.0);  
+  };
+
+  // Main 
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+  console.log(border.name);
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](raster.pixelData,raster.width,raster.height,kernel,border,linearFunc);
+
   return output;
 }
 
@@ -2292,9 +2604,8 @@ const convolveSeparable = (kernel1, kernel2, wrap = cpu.BORDER_CLAMP_TO_BORDER) 
  * @author TODO
  */
 const gaussBlur = (kernel) => (raster,copy=true) => {
-  let output =  TRaster.from(img,copy);
   // TODO
-  return output;
+  return convolve(kernel)(raster,copy);
 }
 
 /**
@@ -2308,7 +2619,7 @@ const gaussBlur = (kernel) => (raster,copy=true) => {
  * @author TODO
  */
 const mean = (kernel) => (raster,copy=true) => {
-  return convolve(kernel)(img,copy);
+  return convolve(kernel)(raster,copy);
 }
 
 
@@ -2317,7 +2628,7 @@ const mean = (kernel) => (raster,copy=true) => {
 
 
 /***/ }),
-/* 15 */
+/* 17 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2526,7 +2837,7 @@ const calc = (other,func) => (raster,copy_mode=true) => {
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2611,11 +2922,15 @@ const noise = (standardDeviation = 25.0) => (raster,copy_mode = true) => {
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return varianceFilter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return medianFilter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return maximumFilter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return minimumFilter; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return varianceFilter; });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__filters_common_js__ = __webpack_require__(1);
 /*
  *  TIMES: Tiny Image ECMAScript Application
  *  Copyright (C) 2017  Jean-Christophe Taveau.
@@ -2642,6 +2957,8 @@ const noise = (standardDeviation = 25.0) => (raster,copy_mode = true) => {
 
 
 
+
+
 /**
  * @module rankFilters
  */
@@ -2649,14 +2966,19 @@ const noise = (standardDeviation = 25.0) => (raster,copy_mode = true) => {
  
 // Helper Function
 
-// Compute Integral Image
-const integral = (data) => {
-    return data.reduce((sum,px,i,arr) => {
-        let x = i % w;
-        sum[x] += px;
-        arr[i] = sum[x] + ((x == 0 ) ? 0.0 : arr[i-1]);
-        return sum;
-    },new Float32Array(w).fill(0.0));   
+// Compute Integral Image ?
+const integral = (data,func) => {
+  // Adapted from 
+  // 
+  let integral = new Float32Array(raster.length);
+  let dummy = raster.pixelData.reduce( (rowSum, px, i) => {
+    let x = i % w; // Get X-coord
+    rowSum[x] += func(px);
+    integral[i] = rowSum[x] + ((x === 0) ? 0.0 : integral[ i - 1]);
+    return rowSum;
+    }, 
+    new Float32Array(w).fill(0.0)
+  );  
 }
 
 /**
@@ -2677,7 +2999,8 @@ const minimum = (kernel) => (img,copy=true) => {
 
 
 /**
- * Variance filter :  It will first compute the summed area table of 
+ * Variance filter
+ * Principle: It will first compute the summed area table of 
  * all the pixels wihtin the first img and after compute the summed squared area 
  * table of all the pixels within the img2.
  * After this process the two img are then padded with 0 according to
@@ -2691,34 +3014,33 @@ const minimum = (kernel) => (img,copy=true) => {
  * @param {boolean} copy - Copy mode to manage memory usage
  * @return {TRaster} - Filtered Image
  *
- * @author Franck Soubès - Jean-Christophe Taveau 
+ * @author Franck Soubès
+ * @author Jean-Christophe Taveau - Bug Fix
  */
-const varianceFast = (kernel) => (img,copy_mode = true) => {
+const varianceFast = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (img,copy_mode = true) => {
 
-    let output = T.Raster.from(img,copy_mode);
-    let w= img.width;
-    let h = img.height;
-    let wk = kernel.width;
-    let img2 = new T.Image(img.type,w,h);
-    let squared = img.pixelData.map((x) => x * x );
-    img2.setPixels(squared);
-    let imgsqr= T.Raster.from(img2.raster,copy_mode);
+  let output = T.Raster.from(img,copy_mode);
+  let w= img.width;
+  let h = img.height;
+  let wk = kernel.width;
+  let img2 = new T.Image(img.type,w,h);
+  let squared = img.pixelData.map((x) => x * x );
+  img2.setPixels(squared);
+  let imgsqr= T.Raster.from(img2.raster,copy_mode);
 
-       
-    
-     /*
-     	Integral Image proposed by JC.Taveau
-     */
+  // cf: Grzegorz Sarwas & Sławomir Skoneczny, Object Localization and Detection Using Variance Filter.
+  // Compute integral image of sum
+  // Compute integral image of squared sum
+  // Extract boxes and subtract.
 
-    
-
-
-    
-    img2.raster.pixelData.reduce((sum1,px,i) => {
-	let x = i%w;
-	sum1[x] += px;
-	img2.raster.pixelData[i] = sum1[x] + ((x == 0 ) ? 0.0 : img2.raster.pixelData[i-1])
-	return sum1;},new Float32Array(w).fill(0.0));
+  let sum = integral(raster.pixelData,(x) => x);
+  let sumSquared = integral(raster.pixelData,(x) => x * x);
+  img2.raster.pixelData.reduce((sum1,px,i) => {
+    let x = i%w;
+    sum1[x] += px;
+    img2.raster.pixelData[i] = sum1[x] + ((x == 0 ) ? 0.0 : img2.raster.pixelData[i-1])
+    return sum1;
+  },new Float32Array(w).fill(0.0));
     
 
     /*
@@ -2751,23 +3073,21 @@ const varianceFast = (kernel) => (img,copy_mode = true) => {
     return output;
 }
 
-
-const padding = function(img,k,w,h,flag,copy_mode = true){
-
-    /**
-     * Padding : Fill with 0 an image in function of the kernel radius.
-     *
-     * @param {TRaster} img - Input image to process.
-     * @param {TRaster} k - Convolution mask represented by a single value (width*height).
-     * @param {TRaster} w - width of the image.
-     * @param {TRaster} h - height of the image.
-     * @param {boolean} flag - if true it will take the raster from the img and the pixelData from the raster
-     * if it is false just the pixelData from the raster.
-     * @param {boolean} copy - Copy mode to manage memory usage
-     * @return {TRaster} - Padded image with 0 and with computed coordinates.
-     * 
-     * @author Franck Soubès
-     */
+/**
+ * Padding : Fill with 0 an image in function of the kernel radius.
+ *
+ * @param {TRaster} img - Input image to process.
+ * @param {TRaster} k - Convolution mask represented by a single value (width*height).
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {boolean} flag - if true it will take the raster from the img and the pixelData from the raster
+ * if it is false just the pixelData from the raster.
+ * @param {boolean} copy - Copy mode to manage memory usage
+ * @return {TRaster} - Padded image with 0 and with computed coordinates.
+ * 
+ * @author Franck Soubès
+ */
+const padding = function(img,k,w,h,flag,copy_mode = true) {
     
     let ima ;
     if (flag){
@@ -2799,36 +3119,34 @@ const padding = function(img,k,w,h,flag,copy_mode = true){
     return img;
 }
 
+/**
+ * Getcoord : Compute the four coordinates of the main algorithm and treat the edges.
+ *
+ * @param {Array} img -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @param {hight} w - height of the image.
+ * @param {width} h - width of the image.
+ * @param {kernel} k - Convolution mask represented by a single value.
+ * @return {Array} - return an array of pixel wih computed pixels.
+ *
+ * @author Franck Soubès
+ */
 const Getcoord = function (img ,w,h,k,copy_mode=false){
+  let img_returned =[];
     
-    /**
-     * Getcoord : Compute the four coordinates of the main algorithm and treat the edges.
-     *
-     * @param {Array} img -  Convolution mask represented by a single value
-     * width*height of the kernel.
-     * @param {hight} w - height of the image.
-     * @param {width} h - width of the image.
-     * @param {kernel} k - Convolution mask represented by a single value.
-     * @return {Array} - return an array of pixel wih computed pixels.
-     *
-     * @author Franck Soubès
-     */
+for (let x = k-1  ;  x <= h + (k-2) ; x++){
+    for(  let y = k-1  ; y <= w+(k-2) ; y++){
+        
+        // push black pixel for abberant coordinnates that'll falsify the results
+        img[x-1][y-1] == 0 && img[x+k-1][y-1] == 0 ||// left
+        img[x+k-1][y+k-1] == 0 && img[x+k-1][y-1]== 0 && img[x+k-1][y+k-1] == 0 || // down
+        img[x-1][y-1] == 0 && img[x-1][y+k-1] == 0 ||// up
+        img[x+k-1][y+k-1] == 0 && img[x-1][y+k-1] == 0 // right
+        ? img_returned.push(0): img_returned.push(img[x-1][y-1]-img[x+k-1][y-1]-img[x-1][y+k-1]+img[x+k-1][y+k-1]);
 
-    let img_returned =[];
-    
-    for (let x = k-1  ;  x <= h + (k-2) ; x++){
-	for(  let y = k-1  ; y <= w+(k-2) ; y++){
-	    
-	    // push black pixel for abberant coordinnates that'll falsify the results
-	    img[x-1][y-1] == 0 && img[x+k-1][y-1] == 0 ||// left
-	    img[x+k-1][y+k-1] == 0 && img[x+k-1][y-1]== 0 && img[x+k-1][y+k-1] == 0 || // down
-	    img[x-1][y-1] == 0 && img[x-1][y+k-1] == 0 ||// up
-	    img[x+k-1][y+k-1] == 0 && img[x-1][y+k-1] == 0 // right
-	    ? img_returned.push(0): img_returned.push(img[x-1][y-1]-img[x+k-1][y-1]-img[x-1][y+k-1]+img[x+k-1][y+k-1]);
-
-	}
     }
-    return img_returned; // 1d
+}
+return img_returned; // 1d
 }
 
 /**
@@ -2848,45 +3166,11 @@ const Getcoord = function (img ,w,h,k,copy_mode=false){
  */
 const varianceFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
 
-   // Manage clamp to border - outside: 0
-   const clampBorder = (pixels,x,y,width,height) => {
-    return (x >=0 && x < width && y >=0 && y < height) ? pixels[x + y * width] : 0;
-  };
-  
-  // Manage clamp to edge - outside: value of the image edge
-  const clampEdge = (pixels, x,y,width,height) => {
-    let xx = Math.min(Math.max(x,0),width  - 1);
-    let yy = Math.min(Math.max(y,0),height - 1);
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage repeat - outside: value of the image tile (like OpenGL texture wrap mode)
-  const repeat = (pixels, x,y,width,height) => {
-    let xx = (width  + x ) % width;
-    let yy = (height + y ) % height;
-    return pixels[xx + yy * width];
-  };
-  
-  // Manage mirror - outside: value of the image mirrored tile (like OpenGL texture wrap mode)
-  // BUG
-  const mirror = (pixels, x,y, width,height) => {
-    // BUG
-    let xx = Math.trunc(x / width) * 2 * (width  - 1)  - x;
-    let yy = Math.trunc(y / height) * 2 * (height  - 1)  - y;
-    return pixels[xx + yy * width];
-  };
-  
-  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? clampEdge : ( (wrap === cpu.BORDER_REPEAT) ? repeat : ( (wrap === cpu.BORDER_MIRROR) ? mirror : clampBorder));
-  console.log(border.name);
-  let input = raster.pixelData;
-  let output =  T.Raster.from(raster,false);
-  // Main 
-  let width = raster.width;
-  let height = raster.height;
-  output.pixelData = input.map( (px, index, pixels) => {
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const varianceFunc = (index,pixels,width,height,kernel,borderFunc) => {
     let [sum, sum2] =  kernel.reduce( (sum,v) => {
-      // Get pixel value in kernel
-      let pix = border(
+      // Get pixel value in kernel depending of border management
+      let pix = borderFunc(
         pixels,
         cpu.getX(index,width) + v.offsetX, 
         cpu.getY(index,width) + v.offsetY,
@@ -2898,12 +3182,116 @@ const varianceFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,co
       return sum;
     },[0.0,0.0]);
     return (sum2 - (sum * sum)/kernel.length)/(kernel.length - 1);
-  });
+  };
 
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](raster.pixelData,raster.width,raster.height,kernel,border,varianceFunc);
+  
   // Normalize image?
   cpu.statistics(output);
   console.log(output.statistics);
   return output;
+}
+
+/*
+ * Generic rank filter : simply apply the variance formula. 
+ *
+ * @author Jean-Christophe Taveau -Bug Fix
+ */
+const rankFilter = (kernel, wrap,raster,copy_mode,rankFunc) => {
+  // Calc pixel value at position `index`in array `pixels` of size `width`x`height` with `kernel`
+  const kernelFunc = (index,pixels,width,height,kernel,borderFunc) => {
+    let values = kernel.reduce( (accu,v) => {
+      // Get pixel value in kernel depending of border management
+      let pix = borderFunc(
+        pixels,
+        cpu.getX(index,width) + v.offsetX, 
+        cpu.getY(index,width) + v.offsetY,
+        width,height);
+      accu.push(pix);
+      return accu;
+    },[]);
+    // Minimum, Maximum or Median
+    return rankFunc(...values);
+  };
+
+  // Main
+  let border = (wrap === cpu.BORDER_CLAMP_TO_EDGE) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["c" /* clampEdge */] : ( (wrap === cpu.BORDER_REPEAT) ? __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["e" /* repeat */] : ( (wrap === cpu.BORDER_MIRROR) ? mirror : __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["b" /* clampBorder */]));
+
+  let output =  T.Raster.from(raster,false);
+
+  output.pixelData = __WEBPACK_IMPORTED_MODULE_0__filters_common_js__["a" /* _convolve */](raster.pixelData,raster.width,raster.height,kernel,border,kernelFunc);
+  
+  // Normalize image?
+  cpu.statistics(output);
+  console.log(output.statistics);
+  return output;
+}
+/**
+ * Minimum filter
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const minimumFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  return rankFilter(kernel,wrap,raster,copy_mode,Math.min);
+}
+
+/**
+ * Maximum filter 
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const maximumFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  return rankFilter(kernel,wrap,raster,copy_mode,Math.max);
+}
+
+/**
+ * Median filter 
+ *
+ * @param {TRaster} img1 - Input image to process.
+ * @param {TRaster} img2 - Input image to process.
+ * @param {TRaster} w - width of the image.
+ * @param {TRaster} h - height of the image.
+ * @param {TRaster} type - Return the type of the raster (uint8, uint16, float32  or argb).
+ * @param {TRaster} kernel -  Convolution mask represented by a single value
+ * width*height of the kernel.
+ * @return {TRaster} - return an array with computed variance.
+ *
+ * @author ???
+ * @author Jean-Christophe Taveau
+ */
+const medianFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,copy_mode = true) => {
+  const median = (...values) => {
+    values.sort( (a,b) => a - b);
+    let half = Math.floor(values.length / 2);
+    return (values.length % 2) ? values[half] : (values[half-1] + values[half]) / 2.0;
+  };
+
+  return rankFilter(kernel,wrap,raster,copy_mode,median);
 }
 
 
@@ -2913,8 +3301,9 @@ const varianceFilter = (kernel, wrap = cpu.BORDER_CLAMP_TO_BORDER) => (raster,co
 
 
 
+
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3018,7 +3407,7 @@ const histogram = (binNumber) => (raster, copy_mode = true) => {
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3318,7 +3707,7 @@ const closestValueidx = (x, arr) =>
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3380,7 +3769,7 @@ const fromABGRtoUint8 = (func) => (raster,copy=true) => {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3472,7 +3861,7 @@ const montage = (row,column,scale=1.0,border=0) => (stack,copy_mode=true) => {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3650,7 +4039,7 @@ const render2D = (win) => (img,copy=true) => {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3705,19 +4094,19 @@ const renderVector = (win) => (obj,copy=true) => {
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "viewport", function() { return viewport; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_constants__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gpu_utils__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Processor__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_color__ = __webpack_require__(28);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gpu_math__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gpu_preprocess__ = __webpack_require__(30);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gpu_statistics__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__gpu_constants__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__gpu_utils__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Processor__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__gpu_color__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__gpu_math__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__gpu_preprocess__ = __webpack_require__(32);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_6__gpu_statistics__ = __webpack_require__(33);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "POINTS", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["z"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINES", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["k"]; });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "LINE_LOOP", function() { return __WEBPACK_IMPORTED_MODULE_0__gpu_constants__["l"]; });
@@ -3814,7 +4203,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4093,7 +4482,7 @@ const ONE_MINUS_CONSTANT_ALPHA = 0x8004;
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4274,7 +4663,7 @@ const rectangle = (w,h) => ({
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4725,7 +5114,7 @@ class Processor {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4823,7 +5212,7 @@ const invert = (raster,graphContext, copy_mode = true) => {
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5041,7 +5430,7 @@ const calc = (other,func) => (raster,copy_mode=true) => {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -5119,7 +5508,7 @@ const viewport = (x,y,w,h) => ({name: 'viewport', params: [x,y,w,h]});
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
