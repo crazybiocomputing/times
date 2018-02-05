@@ -27,19 +27,22 @@
 import {clamp,clampUint8,degrees,getX, getY, getIndex, pipe,radians} from './process/utils';
 
 /* Process/color */
-import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels,toRGBA} from './process/color';
+import {red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue,hue, saturation, value,splitChannels, toRGBA} from './process/color';
 
 /* Process/geometry */
 import {crop} from './process/geometry';
 
 /* Process/edgeDetect */
-import {laplacian3x3,laplacian5x5,sobel3x3} from './process/edgeDetect';
+import {canny,laplacian3x3,laplacian5x5,sobel3x3} from './process/edgeDetect';
 
 /* Process/filters */
 import {
   KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,KERNEL_SQUARE,
   BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
   convolve,convolutionKernel,mean,meanKernel} from './process/filters';
+
+/* Process/hough */
+import {findMaxima,getHoughLines,houghLines,houghCircles} from './process/hough';
 
 /* Process/math */
 import {black,calc,chessboard,fillColor,fill,math,ramp,spiral,white} from './process/math';
@@ -57,7 +60,7 @@ import {histogram,statistics} from './process/statistics';
 import {otsu,threshold} from './process/threshold';
 
 //* Process/type */
-import {fromABGRtoUint8} from './process/type';
+import {fromABGRtoUint8, toUint8} from './process/type';
 
 /* Render/view */
 import {montage,view} from './render/view';
@@ -70,18 +73,19 @@ import {renderVector} from './render/renderVector';
 export {
   clamp,clampUint8,degrees,getX, getY, getIndex,pipe,radians,
   red,blue,green,alpha,luminance, chrominanceRed, chrominanceBlue, hue, saturation, value,
-  splitChannels,toRGBA,
+  splitChannels,toGray8,toRGBA,
   crop,
-  laplacian3x3,laplacian5x5,sobel3x3,
+  canny,laplacian3x3,laplacian5x5,sobel3x3,
   KERNEL_RECTANGLE, KERNEL_CROSS, KERNEL_DIAMOND,KERNEL_CIRCLE,KERNEL_SQUARE,
   BORDER_CLAMP_TO_EDGE, BORDER_CLAMP_TO_BORDER, BORDER_REPEAT,BORDER_MIRROR,
+  houghLines, houghCircles,
   convolve,convolutionKernel,mean,meanKernel,
   black,calc,chessboard,fillColor,fill,math,ramp,spiral,white,
   noise,saltAndPepper,
   medianFilter,maximumFilter, minimumFilter, varianceFilter,
   histogram,statistics,
   otsu,threshold,
-  fromABGRtoUint8,
+  fromABGRtoUint8,toUint8,
   montage,view,
   renderUint8,renderUint16,renderFloat32,renderABGR,renderRGBA,render2D,
   renderVector

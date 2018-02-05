@@ -66,6 +66,7 @@ const renderUint8 = (win) => (img8bit,copy=true) => {
  * @author Jean-Christophe Taveau
  */
 const renderUint16 = (win) => (img16bit,copy=true) => {
+  console.log('renderUint16');
   // Tutorial: https://hacks.mozilla.org/2011/12/faster-canvas-pixel-manipulation-with-typed-arrays/
   let imgdata = win.ctx.createImageData(img16bit.width, img16bit.height);
 
@@ -98,7 +99,7 @@ const renderFloat32 = (win) => (imgf32,copy=true) => {
   let dummy = cpu.statistics(imgf32); 
   
   // New RGBA image buffer
-  let buf = new ArrayBuffer(imgf32.length * 4);
+  let buf = new ArrayBuffer(imgf32.width * imgf32.height * 4);
   let buf32 = new Uint32Array(buf);
   let buf8 = new Uint8Array(buf);
   // Fill with ABGR color values
