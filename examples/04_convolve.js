@@ -12,7 +12,6 @@ img1.setPixels(new Uint8Array(boats_pixels));
 let size = 55;
 let radius = size / 2.0
 let meanKernel = cpu.convolutionKernel(
-  cpu.CPU_HARDWARE,                         // For cpu.convolve
   cpu.KERNEL_CIRCLE,                        // Circular kernel
   size,                                        // Circle contained in a squared kernel 5 x 5
   radius,                                      // Radius
