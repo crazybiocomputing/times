@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf8">
+<title>Test GPU</title>
+<link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"> 
+<link rel="stylesheet" type="text/css" href="../css/times.css">
+<script type="text/javascript" src="../javascripts/TIMES.bundle.js"></script>
+<script type="text/javascript" src="../samples/boats_360x288.js"></script>
+<script type="text/javascript" src="../samples/blobs_256x254.js"></script>
+<script type="text/javascript" src="../samples/clown_rgba8888_320x200.js"></script>
+
+</head>
+<body>
+<p>Tests #100 - Use GPU</p>
+<div id="workspace">
+  <canvas id="previewUint8" width="256" height="256"></canvas>
+  <canvas id="previewUint16" width="256" height="256"></canvas>
+  <canvas id="previewFloat32" width="256" height="256"></canvas>
+</div>
+
+<script type="text/javascript" src="./100_render_gpu.js"></script>
+</body>
+</html>

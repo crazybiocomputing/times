@@ -5377,14 +5377,15 @@ class Processor {
      
     this.width = raster.width;
     this.height = raster.height;
-    
+    console.log(raster.type,gl.R16UI,gl.RED_INTEGER);
+
     let texture = this._createTexture(
       gl,
       raster.pixelData,
       raster.width,
       raster.height,
-      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
-      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
+      (raster.type === 'uint8') ? gl.LUMINANCE : ( (raster.type === 'uint16') ? gl.R16UI : ( (raster.type === 'float32') ? gl.R32F : gl.RGBA) ),
+      (raster.type === 'uint8') ? gl.LUMINANCE : ( (raster.type === 'uint16') ? gl.RED_INTEGER : ( (raster.type === 'float32') ? gl.RED : gl.RGBA) ),
       glConstants[raster.type],
       wrap,
       mini,
@@ -5438,16 +5439,15 @@ class Processor {
     return this;
   }
   
-  /**
-   *
-   */
-  postprocess() {
-    // Clean ?
-    // gl.disable(settings)?
-    return this;
-  }
+/**
+ *
+ */
+postprocess() {
+  // Clean ?
+  // gl.disable(settings)?
+  return this;
+}
   
-
 /**
  * 
  */
@@ -5584,21 +5584,36 @@ const invert = (raster,graphContext, copy_mode = true) => {
     gl_Position = vec4( clipSpace * vec2(1,-1), 0.0, 1.0);
   }`;
 
-  let src_fs = `#version 300 es
-  precision mediump float;
-  
-  in vec2 v_texCoord;
-  uniform sampler2D u_image;
+  const getFragmentSource = (samplerType,outVec) => {
+    return `#version 300 es
+    #pragma debug(on)
 
-  out vec4 outColor;
-  
-  void main() {
-    outColor = vec4(1.0 - texture(u_image, v_texCoord).rgb, 1.0); 
-  }`;
+    precision mediump usampler2D;
+    precision mediump float;
+    
+    in vec2 v_texCoord;
+    const float maxUint16 = 65535.0;
+    uniform ${samplerType} u_image;
+    out vec4 outColor;
+    
+    void main() {
+      outColor = vec4(${outVec}, 1.0); 
+    }`;
+  }
   
 
   // Step #1: Create - compile + link - shader program
-  let the_shader = gpu.createProgram(graphContext,src_vs,src_fs);
+  // Set up fragment shader source depending of raster type (uint8, uint16, float32,rgba)
+  let samplerType = (raster.type === 'uint16') ? 'usampler2D' : 'sampler2D';
+  let outColor;
+  switch (raster.type) {
+    case 'uint8': 
+    case 'rgba' : outColor = `1.0 - texture(u_image, v_texCoord).rgb`; break; 
+    case 'uint16': outColor = `vec3(1.0 - float(texture(u_image, v_texCoord).r) / maxUint16 )`; break; 
+    case 'float32': outColor = `vec3(1.0 - texture(u_image, v_texCoord).r)`; break; 
+  }
+
+  let the_shader = gpu.createProgram(graphContext,src_vs,getFragmentSource(samplerType,outColor));
 
   console.log('programs done...');
     

@@ -294,14 +294,15 @@ export class Processor {
      
     this.width = raster.width;
     this.height = raster.height;
-    
+    console.log(raster.type,gl.R16UI,gl.RED_INTEGER);
+
     let texture = this._createTexture(
       gl,
       raster.pixelData,
       raster.width,
       raster.height,
-      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
-      (raster.type === 'uint8' || raster.type === 'uint16' || raster.type === 'float32') ? gl.LUMINANCE : gl.RGBA,
+      (raster.type === 'uint8') ? gl.LUMINANCE : ( (raster.type === 'uint16') ? gl.R16UI : ( (raster.type === 'float32') ? gl.R32F : gl.RGBA) ),
+      (raster.type === 'uint8') ? gl.LUMINANCE : ( (raster.type === 'uint16') ? gl.RED_INTEGER : ( (raster.type === 'float32') ? gl.RED : gl.RGBA) ),
       glConstants[raster.type],
       wrap,
       mini,
@@ -355,16 +356,15 @@ export class Processor {
     return this;
   }
   
-  /**
-   *
-   */
-  postprocess() {
-    // Clean ?
-    // gl.disable(settings)?
-    return this;
-  }
+/**
+ *
+ */
+postprocess() {
+  // Clean ?
+  // gl.disable(settings)?
+  return this;
+}
   
-
 /**
  * 
  */
